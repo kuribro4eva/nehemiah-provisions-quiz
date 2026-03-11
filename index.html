@@ -7,122 +7,135 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --teal:#0D8B82;--teal-dark:#066B67;--teal-light:#E6F5F3;--teal-accent:#D0ECE9;
-  --cream:#FBF4E4;--coral:#E07A5F;
-  --stone-big:#B8956A;--stone-med:#C4AA80;--stone-small:#D4C4A0;
-  --bg:#f7f7f5;--text:#2C3E50;
+html,body{height:100%;overflow:hidden}
+body{font-family:'Nunito',Calibri,sans-serif;background:#0a1628;color:#fff;
+  display:flex;align-items:center;justify-content:center;min-height:100vh}
+
+.game-container{
+  aspect-ratio:16/9;max-width:100vw;max-height:100vh;width:100%;
+  display:grid;grid-template-columns:55% 45%;
+  overflow:hidden;border-radius:12px;position:relative;
+  background:#0a1628;
 }
-body{font-family:'Nunito',Calibri,sans-serif;background:var(--bg);color:var(--text);
-  display:flex;justify-content:center;min-height:100vh;padding:12px}
-#app{width:100%;max-width:640px;position:relative;padding-bottom:40px}
+.game-container:fullscreen{border-radius:0;width:100vw;height:100vh;max-width:none;max-height:none}
+
+/* Left panel */
+.wall-panel{position:relative;overflow:hidden}
+.wall-panel canvas{display:block;width:100%;height:100%}
+
+/* Right panel */
+.right-panel{
+  background:rgba(26,42,74,0.95);overflow-y:auto;padding:28px 24px;
+  display:flex;flex-direction:column;position:relative;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.2) transparent;
+}
+.right-panel::-webkit-scrollbar{width:6px}
+.right-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:3px}
+
+/* Top buttons */
+.top-buttons{position:absolute;top:10px;right:10px;z-index:50;display:flex;gap:6px}
+.top-btn{
+  padding:6px 14px;border-radius:999px;border:none;cursor:pointer;
+  font-size:.95rem;font-family:inherit;font-weight:700;
+  background:#0D8B82;color:#fff;transition:all .2s;
+}
+.top-btn:hover{background:#066B67}
 
 /* Animations */
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
-@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.08)}100%{transform:scale(1)}}
 @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}
   100%{transform:translateY(calc(100vh + 20px)) rotate(720deg);opacity:0}}
 
-.fade-up{animation:fadeUp .45s ease both}
-.pop{animation:pop .35s ease}
+.fade-up{animation:fadeUp .4s ease both}
 .shake{animation:shake .4s ease}
+.pop{animation:pop .3s ease}
 
 /* Buttons */
-.btn{display:inline-block;padding:14px 32px;border:none;border-radius:12px;
-  font-family:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s}
-.btn-primary{background:var(--teal);color:#fff}
-.btn-primary:hover{background:var(--teal-dark)}
-.btn-secondary{background:var(--teal-accent);color:var(--teal-dark)}
-.btn-secondary:hover{background:#c0e5e1}
-
-/* See My Wall floating pill */
-#see-wall-btn{position:fixed;top:16px;right:16px;z-index:100;
-  padding:10px 22px;border-radius:999px;background:var(--teal);color:#fff;
-  font-family:inherit;font-weight:700;font-size:.9rem;border:none;cursor:pointer;
-  box-shadow:0 2px 10px rgba(0,0,0,.18);transition:all .25s;display:none}
-#see-wall-btn:hover{background:var(--teal-dark);transform:translateY(-1px)}
+.btn{display:inline-block;padding:13px 28px;border:none;border-radius:10px;
+  font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-primary{background:#0D8B82;color:#fff}
+.btn-primary:hover{background:#066B67}
+.btn-secondary{background:rgba(13,139,130,0.2);color:#7eddd6;border:1px solid rgba(13,139,130,0.4)}
+.btn-secondary:hover{background:rgba(13,139,130,0.35)}
 
 /* Welcome */
-#welcome{text-align:center;padding:60px 20px 40px}
-#welcome h1{font-size:2.1rem;font-weight:800;color:var(--teal-dark);margin-bottom:4px}
-#welcome .subtitle{font-size:1.1rem;color:var(--teal);font-weight:600;margin-bottom:20px}
-#welcome p{font-size:1rem;line-height:1.6;margin-bottom:28px;color:#555}
+.welcome-content{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px 10px}
+.welcome-content h1{font-size:2rem;font-weight:800;color:#fff;margin-bottom:4px}
+.welcome-content .subtitle{font-size:1.1rem;color:#7eddd6;font-weight:600;margin-bottom:20px}
+.welcome-content p{font-size:.95rem;line-height:1.6;margin-bottom:28px;color:rgba(255,255,255,0.7);max-width:380px}
 
-/* Round screen */
-#round-screen{display:none}
-.round-header{text-align:center;margin-bottom:18px}
-.round-header .round-num{font-size:.85rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px}
-.round-header .phase-label{font-size:1.15rem;font-weight:700;color:var(--teal-dark);margin-top:2px}
+/* Round content */
+.round-header{text-align:center;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.round-num{font-size:.8rem;font-weight:700;color:#7eddd6;text-transform:uppercase;letter-spacing:1px}
+.phase-label{font-size:1.1rem;font-weight:700;color:#fff;margin-top:2px}
+.see-wall-link{font-size:.8rem;color:#7eddd6;cursor:pointer;background:none;border:none;font-family:inherit;font-weight:600;opacity:0.8}
+.see-wall-link:hover{opacity:1;text-decoration:underline}
 
-.scripture-box{background:var(--cream);border-left:5px solid var(--coral);border-radius:0 8px 8px 0;
-  padding:20px 22px;margin-bottom:22px;font-style:italic;line-height:1.55;font-size:1.02rem}
-.scripture-box .ref{display:block;margin-top:8px;font-style:normal;font-size:.85rem;
-  font-weight:700;color:var(--coral)}
+.progress-wrap{width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:99px;margin-bottom:16px;overflow:hidden}
+.progress-bar{height:100%;background:#0D8B82;border-radius:99px;transition:width .4s ease}
 
-.question-text{font-size:1.05rem;font-weight:700;margin-bottom:14px;line-height:1.45}
+.scripture-box{background:#FBF4E4;border-left:4px solid #E07A5F;border-radius:0 8px 8px 0;
+  padding:16px 18px;margin-bottom:18px;font-style:italic;line-height:1.5;font-size:.95rem;color:#2C3E50}
+.scripture-box .ref{display:block;margin-top:6px;font-style:normal;font-size:.82rem;
+  font-weight:700;color:#E07A5F}
 
-.choices{display:flex;flex-direction:column;gap:10px}
-.choice-btn{width:100%;text-align:left;padding:14px 18px;border:2px solid var(--teal-accent);
-  border-radius:10px;background:#fff;font-family:inherit;font-size:.98rem;cursor:pointer;
-  transition:all .18s;line-height:1.4;font-weight:600;color:var(--text)}
-.choice-btn:hover:not(.locked){border-color:var(--teal);background:var(--teal-light)}
-.choice-btn.correct{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark)}
-.choice-btn.wrong{border-color:var(--coral);background:#fdeae5;color:var(--coral)}
-.choice-btn.locked{cursor:default;opacity:.7}
+.question-text{font-size:1rem;font-weight:700;margin-bottom:12px;line-height:1.45;color:#fff}
+
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice-btn{
+  width:100%;text-align:left;padding:12px 16px;border:2px solid rgba(13,139,130,0.3);
+  border-radius:8px;background:rgba(30,52,84,0.8);font-family:inherit;font-size:.92rem;
+  cursor:pointer;transition:all .18s;line-height:1.4;font-weight:600;color:rgba(255,255,255,0.9);
+}
+.choice-btn:hover:not(.locked){border-color:#0D8B82;background:rgba(13,139,130,0.15)}
+.choice-btn.correct{border-color:#0D8B82;background:rgba(13,139,130,0.25);color:#7eddd6}
+.choice-btn.wrong{border-color:#E07A5F;background:rgba(224,122,95,0.15);color:#E07A5F}
+.choice-btn.locked{cursor:default;opacity:.55}
 .choice-btn.locked.correct{opacity:1}
-.choice-btn.selected{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);opacity:1}
+.choice-btn.selected{border-color:#0D8B82;background:rgba(13,139,130,0.25);color:#7eddd6;opacity:1}
 
-.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-weight:600;font-size:.95rem;
+.feedback{margin-top:12px;padding:10px 14px;border-radius:8px;font-weight:600;font-size:.9rem;
   display:none;text-align:center}
 .feedback.show{display:block;animation:fadeUp .3s ease both}
-.feedback.correct-fb{background:var(--teal-light);color:var(--teal-dark)}
-.feedback.wrong-fb{background:#fdeae5;color:var(--coral)}
+.feedback.correct-fb{background:rgba(13,139,130,0.2);color:#7eddd6}
+.feedback.wrong-fb{background:rgba(224,122,95,0.15);color:#E07A5F}
 
-.next-btn-wrap{text-align:center;margin-top:20px}
-
-/* Progress bar */
-.progress-wrap{width:100%;height:8px;background:var(--teal-accent);border-radius:99px;margin-bottom:18px;overflow:hidden}
-.progress-bar{height:100%;background:var(--teal);border-radius:99px;transition:width .4s ease}
+.next-btn-wrap{text-align:center;margin-top:16px}
 
 /* Results */
-#results-screen{display:none;text-align:center;padding:20px 10px}
-#results-screen h2{font-size:1.6rem;font-weight:800;color:var(--teal-dark);margin-bottom:8px}
-.results-msg{font-size:1rem;line-height:1.55;color:#555;margin-bottom:22px;padding:0 8px}
-#wall-canvas{width:100%;border-radius:12px;margin-bottom:22px;display:block}
-.final-app{text-align:left;margin:20px 0;padding:0 4px}
-.final-app .question-text{font-size:1rem}
-.results-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.results-content{flex:1;display:flex;flex-direction:column;padding:10px 0}
+.results-content h2{font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:8px;text-align:center}
+.results-msg{font-size:.92rem;line-height:1.5;color:rgba(255,255,255,0.7);margin-bottom:18px;text-align:center}
+.final-app{margin:16px 0}
+.results-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
 
 /* Confetti */
 .confetti-piece{position:fixed;top:-20px;width:10px;height:10px;border-radius:2px;
   animation:confettiFall linear forwards;pointer-events:none;z-index:9999}
 
-@media(max-width:400px){
-  #welcome h1{font-size:1.6rem}
-  .scripture-box{padding:14px 16px;font-size:.95rem}
-  .choice-btn{padding:12px 14px;font-size:.92rem}
+@media(max-width:900px){
+  body{overflow:auto}
+  .game-container{
+    aspect-ratio:auto;grid-template-columns:1fr;grid-template-rows:40vh 1fr;
+    max-height:none;height:auto;min-height:100vh;border-radius:0;
+  }
 }
 </style>
 </head>
 <body>
-<div id="app">
-  <button id="see-wall-btn" onclick="showResults()">See My Wall</button>
-
-  <!-- Welcome Screen -->
-  <div id="welcome" class="fade-up">
-    <h1>Rebuild the Wall</h1>
-    <div class="subtitle">Nehemiah 1&ndash;3</div>
-    <p>Nehemiah heard that Jerusalem&rsquo;s walls were broken down &mdash; and he decided to do something about it. But first, God provided everything he needed.<br><br>
-    Can you spot God&rsquo;s provisions? Answer correctly to lay strong stones and rebuild the wall!</p>
-    <button class="btn btn-primary" onclick="startGame()">Start Building</button>
+<div class="game-container" id="game-container">
+  <div class="wall-panel">
+    <canvas id="wall-canvas"></canvas>
   </div>
-
-  <!-- Round Screen -->
-  <div id="round-screen"></div>
-
-  <!-- Results Screen -->
-  <div id="results-screen"></div>
+  <div class="right-panel" id="right-panel">
+    <!-- Content injected by JS -->
+  </div>
+  <div class="top-buttons">
+    <button class="top-btn" id="sound-btn" onclick="toggleSound()" title="Toggle sound">&#x1F50A;</button>
+    <button class="top-btn" id="fs-btn" onclick="toggleFullscreen()" title="Fullscreen">&#x26F6;</button>
+  </div>
 </div>
 
 <script>
@@ -211,17 +224,105 @@ var FINAL_APP = {
   ]
 };
 
+/* ===== SOUND ENGINE ===== */
+var SND = {
+  ctx: null,
+  enabled: true,
+
+  init: function() {
+    if (this.ctx) return;
+    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+  },
+
+  play: function(freq, type, duration, rampTo) {
+    if (!this.enabled || !this.ctx) return;
+    var osc = this.ctx.createOscillator();
+    var gain = this.ctx.createGain();
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    if (rampTo) osc.frequency.linearRampToValueAtTime(rampTo, this.ctx.currentTime + duration);
+    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+    osc.start(this.ctx.currentTime);
+    osc.stop(this.ctx.currentTime + duration);
+  },
+
+  click: function() { this.play(800, 'sine', 0.05); },
+
+  correct: function() {
+    this.play(523, 'sine', 0.15);
+    setTimeout(function() { SND.play(659, 'sine', 0.2); }, 100);
+  },
+
+  wrong: function() { this.play(150, 'sawtooth', 0.25); },
+
+  stoneDrop: function() { this.play(300, 'triangle', 0.25, 80); },
+
+  torchLight: function() {
+    if (!this.enabled || !this.ctx) return;
+    var bufferSize = this.ctx.sampleRate * 0.06;
+    var buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    var noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+    var gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+    noise.connect(gain);
+    gain.connect(this.ctx.destination);
+    noise.start();
+    setTimeout(function() { SND.play(440, 'sine', 0.12); }, 50);
+  },
+
+  sunrise: function() {
+    var notes = [262, 330, 392, 523];
+    notes.forEach(function(n, i) {
+      setTimeout(function() { SND.play(n, 'sine', 0.25); }, i * 150);
+    });
+  },
+
+  confetti: function() {
+    for (var i = 0; i < 8; i++) {
+      (function(delay) {
+        setTimeout(function() { SND.play(800 + Math.random() * 1200, 'sine', 0.08); }, delay);
+      })(i * 60);
+    }
+  }
+};
+
 /* ===== STATE ===== */
-var currentRound = 0;
-var phase = "A";
-var attempts = 0;
-var phaseALocked = false;
-var roundResults = [];
+var state = {
+  screen: 'welcome',
+  round: 0,
+  phase: 'A',
+  attempts: 0,
+  results: [],
+  anim: null,
+  dust: [],
+  sunriseFrame: 0,
+  frameCount: 0,
+  phaseALocked: false
+};
+
+// Star positions (generated once)
+var stars = [];
+for (var si = 0; si < 40; si++) {
+  stars.push({ x: Math.random(), y: Math.random() * 0.45, seed: Math.random() * Math.PI * 2, r: 0.5 + Math.random() * 1.2 });
+}
+
+// Provision names for stones
+var PROVISIONS = [];
+for (var pi = 0; pi < ROUNDS.length; pi++) {
+  PROVISIONS.push(ROUNDS[pi].correct);
+}
 
 function initResults() {
-  roundResults = [];
+  state.results = [];
   for (var i = 0; i < 9; i++) {
-    roundResults.push({ completed: false, attempts: 0, appChoice: -1 });
+    state.results.push({ completed: false, attempts: 0, appChoice: -1 });
   }
 }
 
@@ -238,37 +339,413 @@ function shuffle(arr) {
 function esc(s) { return encodeURIComponent(s); }
 function unesc(s) { return decodeURIComponent(s); }
 
-/* ===== START ===== */
+/* ===== FULLSCREEN ===== */
+function toggleFullscreen() {
+  var el = document.getElementById('game-container');
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }
+}
+
+function onFullscreenChange() {
+  resizeCanvas();
+}
+document.addEventListener('fullscreenchange', onFullscreenChange);
+document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+
+function toggleSound() {
+  SND.enabled = !SND.enabled;
+  document.getElementById('sound-btn').innerHTML = SND.enabled ? '&#x1F50A;' : '&#x1F507;';
+}
+
+/* ===== CANVAS ===== */
+var canvas, ctx, canvasW, canvasH;
+
+function resizeCanvas() {
+  canvas = document.getElementById('wall-canvas');
+  if (!canvas) return;
+  var rect = canvas.parentElement.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  canvasW = rect.width;
+  canvasH = rect.height;
+  canvas.width = canvasW * dpr;
+  canvas.height = canvasH * dpr;
+  canvas.style.width = canvasW + 'px';
+  canvas.style.height = canvasH + 'px';
+  ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function roundRect(c, x, y, w, h, r) {
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.lineTo(x + w - r, y);
+  c.quadraticCurveTo(x + w, y, x + w, y + r);
+  c.lineTo(x + w, y + h - r);
+  c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  c.lineTo(x + r, y + h);
+  c.quadraticCurveTo(x, y + h, x, y + h - r);
+  c.lineTo(x, y + r);
+  c.quadraticCurveTo(x, y, x + r, y);
+  c.closePath();
+}
+
+function wrapText(c, text, x, y, maxWidth, lineHeight) {
+  var words = text.split(' ');
+  var line = '';
+  var lines = [];
+  for (var n = 0; n < words.length; n++) {
+    var testLine = line + words[n] + ' ';
+    if (c.measureText(testLine).width > maxWidth && n > 0) {
+      lines.push(line.trim());
+      line = words[n] + ' ';
+    } else {
+      line = testLine;
+    }
+  }
+  lines.push(line.trim());
+  var startY = y - ((lines.length - 1) * lineHeight) / 2;
+  for (var i = 0; i < lines.length; i++) {
+    c.fillText(lines[i], x, startY + i * lineHeight);
+  }
+}
+
+function drawScene() {
+  if (!ctx) return;
+  var W = canvasW, H = canvasH;
+  state.frameCount++;
+
+  // 1. Night sky gradient
+  var skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+  skyGrad.addColorStop(0, '#0a1628');
+  skyGrad.addColorStop(1, '#1a2a4a');
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Sunrise (when all 9 complete)
+  if (state.sunriseFrame > 0) {
+    var sp = Math.min(state.sunriseFrame / 60, 1);
+    var foundationTop = H * 0.88 - H * 0.06;
+    // Wall area
+    var wallLeft = W * 0.1;
+    var wallRight = W * 0.9;
+    var wallMidX = (wallLeft + wallRight) / 2;
+    // Rows
+    var slotAreaTop = foundationTop - (H * 0.58); // approx top of top row
+    var sunCenterY = slotAreaTop - 10;
+
+    // Warm gradient behind wall
+    var sunGrad = ctx.createRadialGradient(wallMidX, sunCenterY, 0, wallMidX, sunCenterY, W * 0.5);
+    sunGrad.addColorStop(0, 'rgba(255,107,53,' + (0.5 * sp) + ')');
+    sunGrad.addColorStop(0.3, 'rgba(255,215,0,' + (0.3 * sp) + ')');
+    sunGrad.addColorStop(1, 'rgba(255,215,0,0)');
+    ctx.fillStyle = sunGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Light rays
+    var rayCount = 6;
+    for (var ri = 0; ri < rayCount; ri++) {
+      var angle = -Math.PI / 2 + (ri - (rayCount - 1) / 2) * 0.28;
+      var rayLen = H * 0.45 * sp;
+      ctx.save();
+      ctx.globalAlpha = 0.18 * sp;
+      ctx.fillStyle = '#ffd700';
+      ctx.beginPath();
+      ctx.moveTo(wallMidX, sunCenterY);
+      ctx.lineTo(wallMidX + Math.cos(angle - 0.04) * rayLen, sunCenterY + Math.sin(angle) * rayLen);
+      ctx.lineTo(wallMidX + Math.cos(angle + 0.04) * rayLen, sunCenterY + Math.sin(angle) * rayLen);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+    if (state.sunriseFrame < 60) state.sunriseFrame++;
+  }
+
+  // 2. Stars
+  for (var si = 0; si < stars.length; si++) {
+    var s = stars[si];
+    var opacity = 0.4 + 0.6 * Math.abs(Math.sin(state.frameCount * 0.02 + s.seed));
+    if (state.sunriseFrame > 30) opacity *= Math.max(0, 1 - (state.sunriseFrame - 30) / 30);
+    ctx.fillStyle = 'rgba(255,255,255,' + opacity + ')';
+    ctx.beginPath();
+    ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 3. Ground
+  var groundH = H * 0.12;
+  var groundY = H - groundH;
+  ctx.fillStyle = '#8B7355';
+  ctx.fillRect(0, groundY, W, groundH);
+  ctx.fillStyle = '#6B5B45';
+  ctx.fillRect(0, groundY, W, 2);
+
+  // 4. Wall foundation
+  var foundH = H * 0.06;
+  var foundY = groundY - foundH;
+  var foundLeft = W * 0.1;
+  var foundW = W * 0.8;
+  ctx.fillStyle = '#5a4a3a';
+  ctx.fillRect(foundLeft, foundY, foundW, foundH);
+
+  // 5. Stone slots (3 cols x 3 rows)
+  var cols = 3, rows = 3;
+  var slotGap = 4;
+  var slotAreaH = H * 0.52;
+  var slotAreaY = foundY - slotAreaH;
+  var slotW = (foundW - slotGap * (cols - 1)) / cols;
+  var slotH = (slotAreaH - slotGap * (rows - 1)) / rows;
+
+  for (var i = 0; i < 9; i++) {
+    var col = i % 3;
+    var row = Math.floor(i / 3);
+    var drawRow = 2 - row; // bottom row = rounds 0-2
+    var sx = foundLeft + col * (slotW + slotGap);
+    var sy = slotAreaY + drawRow * (slotH + slotGap);
+    var res = state.results[i];
+
+    // Check if this slot is being animated
+    var isAnimating = state.anim && state.anim.round === i;
+    var animProgress = 0;
+
+    if (isAnimating) {
+      animProgress = Math.min(state.anim.frame / state.anim.maxFrames, 1);
+    }
+
+    if (res && res.completed) {
+      var stoneScale, color;
+      if (res.attempts === 1) {
+        stoneScale = 1; color = '#B8956A';
+      } else if (res.attempts === 2) {
+        stoneScale = 0.82; color = '#C4AA80';
+      } else {
+        stoneScale = 0.65; color = '#D4C4A0';
+      }
+      var sw = slotW * stoneScale;
+      var sh = slotH * stoneScale;
+      var stoneX = sx + (slotW - sw) / 2;
+      var targetY = sy + (slotH - sh) / 2;
+      var stoneY = targetY;
+
+      if (isAnimating) {
+        var eased = 1 - Math.pow(1 - animProgress, 3); // ease-out cubic
+        stoneY = (targetY - 60) + 60 * eased;
+        if (animProgress < 1) {
+          // Semi-transparent during animation
+        }
+      }
+
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      roundRect(ctx, stoneX + 2, stoneY + 2, sw, sh, 5);
+      ctx.fill();
+
+      // Stone body
+      ctx.fillStyle = color;
+      roundRect(ctx, stoneX, stoneY, sw, sh, 5);
+      ctx.fill();
+
+      // Border
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 1;
+      roundRect(ctx, stoneX, stoneY, sw, sh, 5);
+      ctx.stroke();
+
+      // Texture lines
+      ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(stoneX + sw * 0.15, stoneY + sh * 0.4);
+      ctx.lineTo(stoneX + sw * 0.85, stoneY + sh * 0.4);
+      ctx.moveTo(stoneX + sw * 0.25, stoneY + sh * 0.65);
+      ctx.lineTo(stoneX + sw * 0.75, stoneY + sh * 0.65);
+      ctx.stroke();
+
+      // Provision name
+      ctx.fillStyle = '#fff';
+      var fontSize = Math.max(8, Math.min(12, sw / 9));
+      ctx.font = 'bold ' + fontSize + 'px Nunito, Calibri, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      wrapText(ctx, PROVISIONS[i], stoneX + sw / 2, stoneY + sh / 2, sw - 8, fontSize + 2);
+    } else {
+      // Empty slot - dotted outline
+      ctx.setLineDash([4, 3]);
+      ctx.strokeStyle = '#666';
+      ctx.lineWidth = 1;
+      roundRect(ctx, sx + 4, sy + 4, slotW - 8, slotH - 8, 5);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Round N label
+      ctx.fillStyle = '#666';
+      ctx.font = '600 ' + Math.max(9, Math.min(11, slotW / 10)) + 'px Nunito, Calibri, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Round ' + (i + 1), sx + slotW / 2, sy + slotH / 2);
+    }
+  }
+
+  // 6. Torches (along top of wall)
+  var torchY = slotAreaY - 12;
+  for (var ti = 0; ti < 9; ti++) {
+    var tx = foundLeft + (ti + 0.5) * (foundW / 9);
+    var lit = state.results[ti] && state.results[ti].completed;
+
+    // Stick
+    ctx.fillStyle = lit ? '#8B6914' : '#666';
+    ctx.fillRect(tx - 2, torchY - 16, 4, 20);
+
+    if (lit) {
+      // Flame
+      var flicker1 = Math.sin(state.frameCount * 0.12 + ti * 1.7) * 2;
+      var flicker2 = Math.cos(state.frameCount * 0.09 + ti * 2.3) * 1.5;
+
+      // Glow
+      var glow = ctx.createRadialGradient(tx + flicker1 * 0.3, torchY - 22, 2, tx, torchY - 18, 28);
+      glow.addColorStop(0, 'rgba(255,140,0,0.25)');
+      glow.addColorStop(1, 'rgba(255,140,0,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(tx, torchY - 18, 28, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Inner flame (yellow)
+      ctx.fillStyle = '#ffd700';
+      ctx.beginPath();
+      ctx.ellipse(tx + flicker1 * 0.5, torchY - 22 + flicker2 * 0.3, 3, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Outer flame (orange)
+      ctx.fillStyle = '#ff8c00';
+      ctx.beginPath();
+      ctx.ellipse(tx + flicker1, torchY - 25 + flicker2, 4, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Top flame tip
+      ctx.fillStyle = 'rgba(255,200,50,0.7)';
+      ctx.beginPath();
+      ctx.ellipse(tx + flicker2, torchY - 30 + flicker1 * 0.5, 2, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // Unlit head
+      ctx.fillStyle = '#555';
+      ctx.beginPath();
+      ctx.arc(tx, torchY - 18, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // 7. Dust particles
+  for (var di = state.dust.length - 1; di >= 0; di--) {
+    var d = state.dust[di];
+    d.x += d.vx;
+    d.y += d.vy;
+    d.vy += 0.15; // gravity
+    d.life++;
+    var alpha = 1 - d.life / d.maxLife;
+    if (alpha <= 0) {
+      state.dust.splice(di, 1);
+      continue;
+    }
+    ctx.fillStyle = 'rgba(184,149,106,' + alpha + ')';
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, 2 + (1 - alpha) * 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Advance animation
+  if (state.anim) {
+    state.anim.frame++;
+    if (state.anim.frame >= state.anim.maxFrames) {
+      // Landing - spawn dust
+      var ai = state.anim.round;
+      var acol = ai % 3;
+      var arow = Math.floor(ai / 3);
+      var adrawRow = 2 - arow;
+      var asx = foundLeft + acol * (slotW + slotGap);
+      var asy = slotAreaY + adrawRow * (slotH + slotGap);
+      var centerX = asx + slotW / 2;
+      var centerY = asy + slotH;
+      for (var dp = 0; dp < 8; dp++) {
+        state.dust.push({
+          x: centerX + (Math.random() - 0.5) * slotW * 0.6,
+          y: centerY,
+          vx: (Math.random() - 0.5) * 3,
+          vy: -Math.random() * 3 - 1,
+          life: 0,
+          maxLife: 20
+        });
+      }
+      state.anim = null;
+      // Post-animation callback
+      if (state._animCallback) {
+        var cb = state._animCallback;
+        state._animCallback = null;
+        setTimeout(cb, 200);
+      }
+    }
+  }
+}
+
+function animLoop() {
+  drawScene();
+  requestAnimationFrame(animLoop);
+}
+
+/* ===== SCREEN RENDERING ===== */
+var panel = null;
+
+function renderWelcome() {
+  state.screen = 'welcome';
+  panel.innerHTML =
+    '<div class="welcome-content fade-up">' +
+      '<h1>Rebuild the Wall</h1>' +
+      '<div class="subtitle">Nehemiah 1&ndash;3</div>' +
+      '<p>Nehemiah heard that Jerusalem\u2019s walls were broken down \u2014 and he decided to do something about it. But first, God provided everything he needed.<br><br>' +
+      'Can you spot God\u2019s provisions? Answer correctly to lay strong stones and rebuild the wall!</p>' +
+      '<button class="btn btn-primary" onclick="startGame()">Start Building</button>' +
+    '</div>';
+}
+
 function startGame() {
-  currentRound = 0;
+  SND.init();
+  state.round = 0;
+  state.sunriseFrame = 0;
   initResults();
-  document.getElementById("welcome").style.display = "none";
-  document.getElementById("results-screen").style.display = "none";
-  document.getElementById("round-screen").style.display = "block";
   showRound();
 }
 
 function showRound() {
-  phase = "A";
-  attempts = 0;
-  phaseALocked = false;
-  if (currentRound >= 1) {
-    document.getElementById("see-wall-btn").style.display = "block";
-  }
+  state.screen = 'playing';
+  state.phase = 'A';
+  state.attempts = 0;
+  state.phaseALocked = false;
   renderPhaseA();
 }
 
-/* ===== PHASE A ===== */
 function renderPhaseA() {
-  var r = ROUNDS[currentRound];
+  var r = ROUNDS[state.round];
   var choices = shuffle([r.correct].concat(r.wrong));
-  var pct = Math.round((currentRound / 9) * 100);
+  var pct = Math.round((state.round / 9) * 100);
+
+  var seeWall = '';
+  var completedCount = 0;
+  for (var ci = 0; ci < state.results.length; ci++) { if (state.results[ci].completed) completedCount++; }
+  if (completedCount >= 1) {
+    seeWall = '<button class="see-wall-link" onclick="showResults()">See My Wall</button>';
+  }
 
   var html = '<div class="fade-up">' +
     '<div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%"></div></div>' +
     '<div class="round-header">' +
-      '<div class="round-num">Round ' + (currentRound + 1) + ' of 9</div>' +
-      '<div class="phase-label">What did God provide?</div>' +
+      '<div><div class="round-num">Round ' + (state.round + 1) + ' of 9</div>' +
+      '<div class="phase-label">What did God provide?</div></div>' +
+      seeWall +
     '</div>' +
     '<div class="scripture-box">' +
       r.scripture +
@@ -284,81 +761,84 @@ function renderPhaseA() {
     '<div class="feedback" id="feedback-a"></div>' +
     '<div class="next-btn-wrap" id="next-a" style="display:none">' +
       '<button class="btn btn-primary" onclick="goPhaseB()">Next &rarr;</button>' +
-    '</div>' +
-  '</div>';
+    '</div></div>';
 
-  document.getElementById("round-screen").innerHTML = html;
+  panel.innerHTML = html;
 }
 
 function pickA(btn) {
-  if (phaseALocked) return;
-  attempts++;
-  var val = unesc(btn.getAttribute("data-val"));
-  var r = ROUNDS[currentRound];
-  var fb = document.getElementById("feedback-a");
-  var allBtns = document.querySelectorAll("#choices-a .choice-btn");
+  if (state.phaseALocked) return;
+  SND.init();
+  state.attempts++;
+  var val = unesc(btn.getAttribute('data-val'));
+  var r = ROUNDS[state.round];
+  var fb = document.getElementById('feedback-a');
+  var allBtns = document.querySelectorAll('#choices-a .choice-btn');
 
   if (val === r.correct) {
-    phaseALocked = true;
-    btn.classList.add("correct");
-    btn.classList.add("pop");
+    state.phaseALocked = true;
+    SND.correct();
+    btn.classList.add('correct', 'pop');
     for (var i = 0; i < allBtns.length; i++) {
-      if (allBtns[i] !== btn) allBtns[i].classList.add("locked");
+      if (allBtns[i] !== btn) allBtns[i].classList.add('locked');
     }
     fb.textContent = "That\u2019s right! God provided exactly what was needed.";
-    fb.className = "feedback show correct-fb";
-    roundResults[currentRound].attempts = attempts;
-    document.getElementById("next-a").style.display = "block";
+    fb.className = 'feedback show correct-fb';
+    state.results[state.round].attempts = state.attempts;
+    document.getElementById('next-a').style.display = 'block';
   } else {
-    btn.classList.add("wrong");
-    btn.classList.add("shake");
-    btn.classList.add("locked");
+    SND.wrong();
+    btn.classList.add('wrong', 'shake', 'locked');
 
-    // Count remaining unlocked buttons
     var remaining = 0;
     for (var i = 0; i < allBtns.length; i++) {
-      if (!allBtns[i].classList.contains("locked")) remaining++;
+      if (!allBtns[i].classList.contains('locked')) remaining++;
     }
 
     if (remaining <= 1) {
-      // All wrong picked — reveal correct and move on
-      phaseALocked = true;
-      roundResults[currentRound].attempts = attempts;
+      state.phaseALocked = true;
+      state.results[state.round].attempts = state.attempts;
       for (var i = 0; i < allBtns.length; i++) {
-        var v = unesc(allBtns[i].getAttribute("data-val"));
+        var v = unesc(allBtns[i].getAttribute('data-val'));
         if (v === r.correct) {
-          allBtns[i].classList.add("correct");
-          allBtns[i].classList.add("pop");
+          allBtns[i].classList.add('correct', 'pop');
         } else {
-          allBtns[i].classList.add("locked");
+          allBtns[i].classList.add('locked');
         }
       }
-      fb.textContent = "The answer was: " + r.correct;
-      fb.className = "feedback show wrong-fb";
-      document.getElementById("next-a").style.display = "block";
+      fb.textContent = 'The answer was: ' + r.correct;
+      fb.className = 'feedback show wrong-fb';
+      document.getElementById('next-a').style.display = 'block';
     } else {
       fb.textContent = "Not quite \u2014 try again!";
-      fb.className = "feedback show wrong-fb";
+      fb.className = 'feedback show wrong-fb';
     }
   }
 }
 
-/* ===== PHASE B ===== */
 function goPhaseB() {
-  phase = "B";
+  state.phase = 'B';
   renderPhaseB();
 }
 
 function renderPhaseB() {
-  var r = ROUNDS[currentRound];
-  var pct = Math.round(((currentRound + 0.5) / 9) * 100);
-  var labels = ["A", "B", "C"];
+  var r = ROUNDS[state.round];
+  var pct = Math.round(((state.round + 0.5) / 9) * 100);
+  var labels = ['A', 'B', 'C'];
+
+  var seeWall = '';
+  var completedCount = 0;
+  for (var ci = 0; ci < state.results.length; ci++) { if (state.results[ci].completed) completedCount++; }
+  if (completedCount >= 1) {
+    seeWall = '<button class="see-wall-link" onclick="showResults()">See My Wall</button>';
+  }
 
   var html = '<div class="fade-up">' +
     '<div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%"></div></div>' +
     '<div class="round-header">' +
-      '<div class="round-num">Round ' + (currentRound + 1) + ' of 9</div>' +
-      '<div class="phase-label">Life Connection</div>' +
+      '<div><div class="round-num">Round ' + (state.round + 1) + ' of 9</div>' +
+      '<div class="phase-label">Life Connection</div></div>' +
+      seeWall +
     '</div>' +
     '<div class="question-text">' + r.appQ + '</div>' +
     '<div class="choices" id="choices-b">';
@@ -370,47 +850,55 @@ function renderPhaseB() {
   html += '</div>' +
     '<div class="next-btn-wrap" id="next-b" style="display:none">' +
       '<button class="btn btn-primary" onclick="finishRound()">Continue Building &rarr;</button>' +
-    '</div>' +
-  '</div>';
+    '</div></div>';
 
-  document.getElementById("round-screen").innerHTML = html;
+  panel.innerHTML = html;
 }
 
 function pickB(btn, idx) {
-  var allBtns = document.querySelectorAll("#choices-b .choice-btn");
-  // Allow changing selection
+  SND.init();
+  SND.click();
+  var allBtns = document.querySelectorAll('#choices-b .choice-btn');
   for (var i = 0; i < allBtns.length; i++) {
-    allBtns[i].classList.remove("selected", "locked");
+    allBtns[i].classList.remove('selected', 'locked');
   }
-  btn.classList.add("selected");
+  btn.classList.add('selected');
   for (var i = 0; i < allBtns.length; i++) {
-    if (allBtns[i] !== btn) allBtns[i].classList.add("locked");
+    if (allBtns[i] !== btn) allBtns[i].classList.add('locked');
   }
-  roundResults[currentRound].appChoice = idx;
-  roundResults[currentRound].completed = true;
-  document.getElementById("next-b").style.display = "block";
+  state.results[state.round].appChoice = idx;
+  state.results[state.round].completed = true;
+  document.getElementById('next-b').style.display = 'block';
 }
 
 function finishRound() {
-  currentRound++;
-  if (currentRound >= 9) {
-    showResults();
-  } else {
-    showRound();
-  }
+  // Start stone-drop animation
+  state.anim = { round: state.round, frame: 0, maxFrames: 25 };
+  SND.stoneDrop();
+
+  var thisRound = state.round;
+  state._animCallback = function() {
+    SND.torchLight();
+    setTimeout(function() {
+      state.round++;
+      if (state.round >= 9) {
+        SND.sunrise();
+        state.sunriseFrame = 1;
+        setTimeout(function() { showResults(); }, 300);
+      } else {
+        showRound();
+      }
+    }, 400);
+  };
 }
 
 /* ===== RESULTS ===== */
 function showResults() {
-  document.getElementById("round-screen").style.display = "none";
-  document.getElementById("welcome").style.display = "none";
-  document.getElementById("see-wall-btn").style.display = "none";
-  var rs = document.getElementById("results-screen");
-  rs.style.display = "block";
+  state.screen = 'results';
 
   var completed = 0;
-  for (var i = 0; i < roundResults.length; i++) {
-    if (roundResults[i].completed) completed++;
+  for (var i = 0; i < state.results.length; i++) {
+    if (state.results[i].completed) completed++;
   }
   var allDone = (completed === 9);
 
@@ -418,12 +906,12 @@ function showResults() {
   if (allDone) {
     msg = "Your wall is complete! Just as God provided everything Nehemiah needed, He provides for you too.";
   } else if (completed === 0) {
-    msg = "Your wall is waiting to be built! Come back and discover all the ways God provided for Nehemiah.";
+    msg = "Your wall is waiting! Come back to discover how God provided for Nehemiah.";
   } else {
-    msg = "You\u2019ve laid " + completed + " stone" + (completed > 1 ? "s" : "") + " so far! Every provision you found is a reminder of God\u2019s faithfulness. Come back anytime to finish your wall.";
+    msg = "You\u2019ve laid " + completed + " stone" + (completed > 1 ? "s" : "") + " so far! Every provision you found is a reminder of God\u2019s faithfulness.";
   }
 
-  var labels = ["A", "B", "C"];
+  var labels = ['A', 'B', 'C'];
   var btnsHtml;
   if (allDone) {
     btnsHtml = '<button class="btn btn-primary" onclick="resetGame()">Play Again</button>';
@@ -432,10 +920,9 @@ function showResults() {
                '<button class="btn btn-secondary" onclick="resetGame()">Start Over</button>';
   }
 
-  var html = '<div class="fade-up">' +
-    '<h2>' + (allDone ? "Wall Complete!" : "Your Wall So Far") + '</h2>' +
+  var html = '<div class="results-content fade-up">' +
+    '<h2>' + (allDone ? 'Wall Complete!' : 'Your Wall So Far') + '</h2>' +
     '<p class="results-msg">' + msg + '</p>' +
-    '<canvas id="wall-canvas" width="600" height="300"></canvas>' +
     '<div class="final-app">' +
       '<div class="question-text">' + FINAL_APP.stem + '</div>' +
       '<div class="choices" id="final-choices">';
@@ -445,186 +932,57 @@ function showResults() {
   }
 
   html += '</div></div>' +
-    '<div class="results-btns">' + btnsHtml + '</div>' +
-  '</div>';
+    '<div class="results-btns">' + btnsHtml + '</div></div>';
 
-  rs.innerHTML = html;
-  drawWall(false);
+  panel.innerHTML = html;
 
   if (allDone) {
     setTimeout(launchConfetti, 400);
+    setTimeout(function() { SND.confetti(); }, 500);
   }
 }
 
 function pickFinal(btn) {
-  var allBtns = document.querySelectorAll("#final-choices .choice-btn");
+  SND.init();
+  SND.click();
+  var allBtns = document.querySelectorAll('#final-choices .choice-btn');
   for (var i = 0; i < allBtns.length; i++) {
-    allBtns[i].classList.remove("selected", "locked");
+    allBtns[i].classList.remove('selected', 'locked');
   }
-  btn.classList.add("selected");
+  btn.classList.add('selected');
   for (var i = 0; i < allBtns.length; i++) {
-    if (allBtns[i] !== btn) allBtns[i].classList.add("locked");
+    if (allBtns[i] !== btn) allBtns[i].classList.add('locked');
   }
 }
 
 function keepBuilding() {
-  // Find next incomplete round
   var next = -1;
-  for (var i = 0; i < roundResults.length; i++) {
-    if (!roundResults[i].completed) { next = i; break; }
+  for (var i = 0; i < state.results.length; i++) {
+    if (!state.results[i].completed) { next = i; break; }
   }
   if (next === -1) { showResults(); return; }
-  currentRound = next;
-  document.getElementById("results-screen").style.display = "none";
-  document.getElementById("round-screen").style.display = "block";
+  state.round = next;
   showRound();
 }
 
 function resetGame() {
-  document.getElementById("results-screen").style.display = "none";
-  document.getElementById("welcome").style.display = "block";
-  document.getElementById("see-wall-btn").style.display = "none";
-}
-
-/* ===== WALL CANVAS ===== */
-function drawWall(animate) {
-  var canvas = document.getElementById("wall-canvas");
-  if (!canvas) return;
-  var ctx = canvas.getContext("2d");
-
-  // Handle high-DPI displays
-  var dpr = window.devicePixelRatio || 1;
-  var displayW = canvas.clientWidth;
-  var displayH = 300;
-  canvas.style.height = displayH + "px";
-  canvas.width = displayW * dpr;
-  canvas.height = displayH * dpr;
-  ctx.scale(dpr, dpr);
-
-  var W = displayW;
-  var H = displayH;
-
-  // Background
-  ctx.fillStyle = "#e8e0d0";
-  roundRect(ctx, 0, 0, W, H, 12);
-  ctx.fill();
-
-  // Ground line
-  ctx.fillStyle = "#c4b896";
-  roundRect(ctx, 0, H - 16, W, 16, 6);
-  ctx.fill();
-
-  // Wall grid: 3 rows x 3 cols = 9 sections
-  var cols = 3, rows = 3;
-  var pad = 16;
-  var gapX = 10, gapY = 10;
-  var totalW = W - pad * 2;
-  var totalH = H - pad * 2 - 16; // leave room for ground
-  var cellW = (totalW - gapX * (cols - 1)) / cols;
-  var cellH = (totalH - gapY * (rows - 1)) / rows;
-
-  for (var i = 0; i < 9; i++) {
-    var col = i % 3;
-    var row = Math.floor(i / 3);
-    var x = pad + col * (cellW + gapX);
-    // Draw from bottom row up: round 0-2 = bottom, 3-5 = middle, 6-8 = top
-    var drawRow = 2 - row;
-    var y = pad + drawRow * (cellH + gapY);
-    var res = roundResults[i];
-
-    if (res && res.completed) {
-      var stoneW, stoneH, color, shadowColor;
-      if (res.attempts === 1) {
-        stoneW = cellW; stoneH = cellH;
-        color = "#B8956A"; shadowColor = "rgba(139,112,78,0.35)";
-      } else if (res.attempts === 2) {
-        stoneW = cellW * 0.82; stoneH = cellH * 0.82;
-        color = "#C4AA80"; shadowColor = "rgba(150,130,90,0.3)";
-      } else {
-        stoneW = cellW * 0.65; stoneH = cellH * 0.65;
-        color = "#D4C4A0"; shadowColor = "rgba(160,148,110,0.25)";
-      }
-      var sx = x + (cellW - stoneW) / 2;
-      var sy = y + (cellH - stoneH) / 2;
-
-      // Shadow
-      ctx.fillStyle = shadowColor;
-      roundRect(ctx, sx + 3, sy + 3, stoneW, stoneH, 6);
-      ctx.fill();
-
-      // Stone body
-      ctx.fillStyle = color;
-      roundRect(ctx, sx, sy, stoneW, stoneH, 6);
-      ctx.fill();
-
-      // Stone border
-      ctx.strokeStyle = "rgba(0,0,0,0.1)";
-      ctx.lineWidth = 1;
-      roundRect(ctx, sx, sy, stoneW, stoneH, 6);
-      ctx.stroke();
-
-      // Texture lines
-      ctx.strokeStyle = "rgba(0,0,0,0.06)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(sx + stoneW * 0.15, sy + stoneH * 0.4);
-      ctx.lineTo(sx + stoneW * 0.85, sy + stoneH * 0.4);
-      ctx.moveTo(sx + stoneW * 0.25, sy + stoneH * 0.65);
-      ctx.lineTo(sx + stoneW * 0.75, sy + stoneH * 0.65);
-      ctx.stroke();
-
-      // Label
-      ctx.fillStyle = "#fff";
-      ctx.font = "bold " + Math.max(11, Math.min(14, cellW / 8)) + "px Nunito, Calibri, sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("Round " + (i + 1), x + cellW / 2, y + cellH / 2);
-    } else {
-      // Gap - dotted outline
-      ctx.setLineDash([5, 4]);
-      ctx.strokeStyle = "#B0B0B0";
-      ctx.lineWidth = 2;
-      roundRect(ctx, x + 6, y + 6, cellW - 12, cellH - 12, 6);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Gap label
-      ctx.fillStyle = "#bbb";
-      ctx.font = "600 " + Math.max(10, Math.min(12, cellW / 9)) + "px Nunito, Calibri, sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("Round " + (i + 1), x + cellW / 2, y + cellH / 2);
-    }
-  }
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
+  state.sunriseFrame = 0;
+  renderWelcome();
 }
 
 /* ===== CONFETTI ===== */
 function launchConfetti() {
-  var colors = ["#0D8B82", "#E07A5F", "#F2CC8F", "#81B29A", "#3D405B", "#F4F1DE"];
+  var colors = ['#0D8B82', '#E07A5F', '#ffd700', '#7eddd6', '#B8956A', '#fff'];
   for (var i = 0; i < 80; i++) {
-    var el = document.createElement("div");
-    el.className = "confetti-piece";
-    el.style.left = (Math.random() * 100) + "vw";
+    var el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = (Math.random() * 100) + 'vw';
     el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-    el.style.width = (6 + Math.random() * 8) + "px";
-    el.style.height = (6 + Math.random() * 8) + "px";
-    el.style.animationDuration = (2 + Math.random() * 2) + "s";
-    el.style.animationDelay = (Math.random() * 1.5) + "s";
-    el.style.borderRadius = (Math.random() > 0.5 ? "50%" : "2px");
+    el.style.width = (6 + Math.random() * 8) + 'px';
+    el.style.height = (6 + Math.random() * 8) + 'px';
+    el.style.animationDuration = (2 + Math.random() * 2) + 's';
+    el.style.animationDelay = (Math.random() * 1.5) + 's';
+    el.style.borderRadius = (Math.random() > 0.5 ? '50%' : '2px');
     document.body.appendChild(el);
     (function(elem) {
       setTimeout(function() { if (elem.parentNode) elem.parentNode.removeChild(elem); }, 5500);
@@ -633,7 +991,17 @@ function launchConfetti() {
 }
 
 /* ===== INIT ===== */
-initResults();
+window.addEventListener('load', function() {
+  panel = document.getElementById('right-panel');
+  initResults();
+  resizeCanvas();
+  renderWelcome();
+  animLoop();
+});
+
+window.addEventListener('resize', function() {
+  resizeCanvas();
+});
 </script>
 </body>
 </html>
