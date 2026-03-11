@@ -13,17 +13,17 @@ body{font-family:'Nunito',Calibri,sans-serif;background:#0a1628;color:#fff;
 
 .game-container{
   aspect-ratio:16/9;max-width:100vw;max-height:100vh;width:100%;
-  display:grid;grid-template-columns:55% 45%;
+  display:grid;grid-template-columns:45% 55%;
   overflow:hidden;border-radius:12px;position:relative;
   background:#0a1628;
 }
 .game-container:fullscreen{border-radius:0;width:100vw;height:100vh;max-width:none;max-height:none}
 
-/* Left panel */
+/* Right panel (wall canvas) */
 .wall-panel{position:relative;overflow:hidden}
 .wall-panel canvas{display:block;width:100%;height:100%}
 
-/* Right panel */
+/* Left panel (questions) */
 .right-panel{
   background:rgba(26,42,74,0.95);overflow-y:auto;padding:28px 24px;
   display:flex;flex-direction:column;position:relative;
@@ -72,6 +72,8 @@ body{font-family:'Nunito',Calibri,sans-serif;background:#0a1628;color:#fff;
 .phase-label{font-size:1.1rem;font-weight:700;color:#fff;margin-top:2px}
 .see-wall-link{font-size:.8rem;color:#7eddd6;cursor:pointer;background:none;border:none;font-family:inherit;font-weight:600;opacity:0.8}
 .see-wall-link:hover{opacity:1;text-decoration:underline}
+.wrap-up-link{font-size:.78rem;color:#aab;cursor:pointer;background:none;border:none;font-family:inherit;font-weight:600;opacity:0.7;margin-left:6px}
+.wrap-up-link:hover{opacity:1;text-decoration:underline;color:#7eddd6}
 
 .progress-wrap{width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:99px;margin-bottom:16px;overflow:hidden}
 .progress-bar{height:100%;background:#0D8B82;border-radius:99px;transition:width .4s ease}
@@ -111,6 +113,16 @@ body{font-family:'Nunito',Calibri,sans-serif;background:#0a1628;color:#fff;
 .final-app{margin:16px 0}
 .results-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
 
+/* Wrap Up */
+.wrapup-content{flex:1;display:flex;flex-direction:column;padding:10px 0;overflow-y:auto}
+.wrapup-content h2{font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:10px;text-align:center}
+.wrapup-summary{font-size:.9rem;line-height:1.55;color:rgba(255,255,255,0.65);margin-bottom:16px}
+.wrapup-summary b{color:rgba(255,255,255,0.9)}
+.provisions-list{list-style:none;padding:0;margin:0 0 18px 0}
+.provisions-list li{font-size:.82rem;line-height:1.45;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.7)}
+.provisions-list li .prov-check{color:#0D8B82;font-weight:700;margin-right:6px}
+.provisions-list li .prov-miss{color:#667;margin-right:6px}
+
 /* Confetti */
 .confetti-piece{position:fixed;top:-20px;width:10px;height:10px;border-radius:2px;
   animation:confettiFall linear forwards;pointer-events:none;z-index:9999}
@@ -118,19 +130,20 @@ body{font-family:'Nunito',Calibri,sans-serif;background:#0a1628;color:#fff;
 @media(max-width:900px){
   body{overflow:auto}
   .game-container{
-    aspect-ratio:auto;grid-template-columns:1fr;grid-template-rows:40vh 1fr;
+    aspect-ratio:auto;grid-template-columns:1fr;grid-template-rows:1fr 40vh;
     max-height:none;height:auto;min-height:100vh;border-radius:0;
   }
+  .right-panel{order:-1}
 }
 </style>
 </head>
 <body>
 <div class="game-container" id="game-container">
-  <div class="wall-panel">
-    <canvas id="wall-canvas"></canvas>
-  </div>
   <div class="right-panel" id="right-panel">
     <!-- Content injected by JS -->
+  </div>
+  <div class="wall-panel">
+    <canvas id="wall-canvas"></canvas>
   </div>
   <div class="top-buttons">
     <button class="top-btn" id="sound-btn" onclick="toggleSound()" title="Toggle sound">&#x1F50A;</button>
@@ -224,6 +237,48 @@ var FINAL_APP = {
   ]
 };
 
+var STONE_TEXT = [
+  ["God opened my eyes to a need and I will bring it to Him in prayer before I act.",
+   "God opened my eyes to a need and I will share what I see with someone I trust.",
+   "God opened my eyes to a need and I will seek to understand it before I act."],
+  ["Through prayer I can connect with God, so I will bring my broken friendship to Him.",
+   "Through prayer I can connect with God, so I will bring my decision to Him.",
+   "Through prayer I can connect with God, so I will pray for someone who is hurting."],
+  ["God\u2019s Word gives me wisdom and reminds me what is true when I am confused.",
+   "God\u2019s Word gives me wisdom and courage to do what is right.",
+   "God\u2019s Word gives me wisdom to see people the way God sees them."],
+  ["God gives me courage so I will stand up for someone who needs it.",
+   "God gives me courage so I will start a conversation I have been avoiding.",
+   "God gives me courage to try something hard that He put on my heart."],
+  ["God placed me in my family so I can bring peace and encouragement.",
+   "God placed me at school so I can be a godly example to others.",
+   "God placed me on my team so I can serve the people around me."],
+  ["God is clearing my path by removing the fear that was holding me back.",
+   "God is clearing my path by restoring a relationship that needed healing.",
+   "God is clearing my path by providing a resource I did not expect."],
+  ["God provides what I need for His work so I will use my skills and talents for others.",
+   "God provides what I need for His work so I will give my time to something that matters.",
+   "God provides what I need for His work and I will serve in my home, church, or community."],
+  ["God protects and guides me through a parent or family member who points me to Him.",
+   "God protects and guides me through a teacher or mentor who encourages me.",
+   "God protects and guides me through a friend who helps me make wise choices."],
+  ["God calls His people to work together and I will serve alongside my family for Him.",
+   "God calls His people to work together and my friend and I will encourage each other to grow.",
+   "God calls His people to work together and I will serve side by side with my church."]
+];
+
+var STONE_DEFAULT = [
+  "God lets His people see the needs around them so they can respond.",
+  "God invites His people to connect with Him through prayer.",
+  "God gives wisdom to those who know Him and His Word.",
+  "God gives His people courage to act even when they are afraid.",
+  "God places His people where He wants them to make a difference.",
+  "God opens doors and clears the way for the work He calls us to do.",
+  "God provides the materials and resources His people need for His work.",
+  "God protects and guides His people through those He places around them.",
+  "God calls His people to work together for His purposes."
+];
+
 /* ===== SOUND ENGINE ===== */
 var SND = {
   ctx: null,
@@ -304,7 +359,8 @@ var state = {
   dust: [],
   sunriseFrame: 0,
   frameCount: 0,
-  phaseALocked: false
+  phaseALocked: false,
+  showAllProvisions: false
 };
 
 // Star positions (generated once)
@@ -497,15 +553,20 @@ function drawScene() {
   var slotGap = 4;
   var slotAreaH = H * 0.52;
   var slotAreaY = foundY - slotAreaH;
-  var slotW = (foundW - slotGap * (cols - 1)) / cols;
-  var slotH = (slotAreaH - slotGap * (rows - 1)) / rows;
+
+  // Fix column sizing: use symmetric calculation
+  var wallAreaX = foundLeft;
+  var wallAreaW = foundW;
+  var totalGapW = slotGap * (cols - 1);
+  var cellW = (wallAreaW - totalGapW) / cols;
+  var cellH = (slotAreaH - slotGap * (rows - 1)) / rows;
 
   for (var i = 0; i < 9; i++) {
     var col = i % 3;
     var row = Math.floor(i / 3);
     var drawRow = 2 - row; // bottom row = rounds 0-2
-    var sx = foundLeft + col * (slotW + slotGap);
-    var sy = slotAreaY + drawRow * (slotH + slotGap);
+    var sx = wallAreaX + col * (cellW + slotGap);
+    var sy = slotAreaY + drawRow * (cellH + slotGap);
     var res = state.results[i];
 
     // Check if this slot is being animated
@@ -525,10 +586,10 @@ function drawScene() {
       } else {
         stoneScale = 0.65; color = '#D4C4A0';
       }
-      var sw = slotW * stoneScale;
-      var sh = slotH * stoneScale;
-      var stoneX = sx + (slotW - sw) / 2;
-      var targetY = sy + (slotH - sh) / 2;
+      var sw = cellW * stoneScale;
+      var sh = cellH * stoneScale;
+      var stoneX = sx + (cellW - sw) / 2;
+      var targetY = sy + (cellH - sh) / 2;
       var stoneY = targetY;
 
       if (isAnimating) {
@@ -565,28 +626,43 @@ function drawScene() {
       ctx.lineTo(stoneX + sw * 0.75, stoneY + sh * 0.65);
       ctx.stroke();
 
-      // Provision name
+      // Personalized stone text
+      var stoneLabel;
+      if (res.completed && res.appChoice >= 0) {
+        stoneLabel = STONE_TEXT[i][res.appChoice];
+      } else {
+        stoneLabel = STONE_DEFAULT[i];
+      }
       ctx.fillStyle = '#fff';
-      var fontSize = Math.max(8, Math.min(12, sw / 9));
+      var fontSize = Math.max(7, Math.min(10, sw / 12));
       ctx.font = 'bold ' + fontSize + 'px Nunito, Calibri, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      wrapText(ctx, PROVISIONS[i], stoneX + sw / 2, stoneY + sh / 2, sw - 8, fontSize + 2);
+      wrapText(ctx, stoneLabel, stoneX + sw / 2, stoneY + sh / 2, sw - 8, fontSize + 2);
     } else {
       // Empty slot - dotted outline
       ctx.setLineDash([4, 3]);
       ctx.strokeStyle = '#666';
       ctx.lineWidth = 1;
-      roundRect(ctx, sx + 4, sy + 4, slotW - 8, slotH - 8, 5);
+      roundRect(ctx, sx + 4, sy + 4, cellW - 8, cellH - 8, 5);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Round N label
-      ctx.fillStyle = '#666';
-      ctx.font = '600 ' + Math.max(9, Math.min(11, slotW / 10)) + 'px Nunito, Calibri, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('Round ' + (i + 1), sx + slotW / 2, sy + slotH / 2);
+      // Show provision name in faint text during wrap-up, else "Round N"
+      if (state.showAllProvisions) {
+        ctx.fillStyle = '#667';
+        var provFontSize = Math.max(8, Math.min(10, cellW / 12));
+        ctx.font = '600 ' + provFontSize + 'px Nunito, Calibri, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        wrapText(ctx, PROVISIONS[i], sx + cellW / 2, sy + cellH / 2, cellW - 16, provFontSize + 2);
+      } else {
+        ctx.fillStyle = '#666';
+        ctx.font = '600 ' + Math.max(9, Math.min(11, cellW / 10)) + 'px Nunito, Calibri, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Round ' + (i + 1), sx + cellW / 2, sy + cellH / 2);
+      }
     }
   }
 
@@ -667,13 +743,13 @@ function drawScene() {
       var acol = ai % 3;
       var arow = Math.floor(ai / 3);
       var adrawRow = 2 - arow;
-      var asx = foundLeft + acol * (slotW + slotGap);
-      var asy = slotAreaY + adrawRow * (slotH + slotGap);
-      var centerX = asx + slotW / 2;
-      var centerY = asy + slotH;
+      var asx = wallAreaX + acol * (cellW + slotGap);
+      var asy = slotAreaY + adrawRow * (cellH + slotGap);
+      var centerX = asx + cellW / 2;
+      var centerY = asy + cellH;
       for (var dp = 0; dp < 8; dp++) {
         state.dust.push({
-          x: centerX + (Math.random() - 0.5) * slotW * 0.6,
+          x: centerX + (Math.random() - 0.5) * cellW * 0.6,
           y: centerY,
           vx: (Math.random() - 0.5) * 3,
           vy: -Math.random() * 3 - 1,
@@ -702,6 +778,7 @@ var panel = null;
 
 function renderWelcome() {
   state.screen = 'welcome';
+  state.showAllProvisions = false;
   panel.innerHTML =
     '<div class="welcome-content fade-up">' +
       '<h1>Rebuild the Wall</h1>' +
@@ -716,6 +793,7 @@ function startGame() {
   SND.init();
   state.round = 0;
   state.sunriseFrame = 0;
+  state.showAllProvisions = false;
   initResults();
   showRound();
 }
@@ -725,7 +803,19 @@ function showRound() {
   state.phase = 'A';
   state.attempts = 0;
   state.phaseALocked = false;
+  state.showAllProvisions = false;
   renderPhaseA();
+}
+
+function buildHeaderLinks() {
+  var completedCount = 0;
+  for (var ci = 0; ci < state.results.length; ci++) { if (state.results[ci].completed) completedCount++; }
+  var links = '';
+  if (completedCount >= 1) {
+    links += '<button class="see-wall-link" onclick="showResults()">See My Wall</button>';
+    links += '<button class="wrap-up-link" onclick="showWrapUp()">Wrap Up</button>';
+  }
+  return links;
 }
 
 function renderPhaseA() {
@@ -733,19 +823,14 @@ function renderPhaseA() {
   var choices = shuffle([r.correct].concat(r.wrong));
   var pct = Math.round((state.round / 9) * 100);
 
-  var seeWall = '';
-  var completedCount = 0;
-  for (var ci = 0; ci < state.results.length; ci++) { if (state.results[ci].completed) completedCount++; }
-  if (completedCount >= 1) {
-    seeWall = '<button class="see-wall-link" onclick="showResults()">See My Wall</button>';
-  }
+  var headerLinks = buildHeaderLinks();
 
   var html = '<div class="fade-up">' +
     '<div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%"></div></div>' +
     '<div class="round-header">' +
       '<div><div class="round-num">Round ' + (state.round + 1) + ' of 9</div>' +
       '<div class="phase-label">What did God provide?</div></div>' +
-      seeWall +
+      '<div>' + headerLinks + '</div>' +
     '</div>' +
     '<div class="scripture-box">' +
       r.scripture +
@@ -826,19 +911,14 @@ function renderPhaseB() {
   var pct = Math.round(((state.round + 0.5) / 9) * 100);
   var labels = ['A', 'B', 'C'];
 
-  var seeWall = '';
-  var completedCount = 0;
-  for (var ci = 0; ci < state.results.length; ci++) { if (state.results[ci].completed) completedCount++; }
-  if (completedCount >= 1) {
-    seeWall = '<button class="see-wall-link" onclick="showResults()">See My Wall</button>';
-  }
+  var headerLinks = buildHeaderLinks();
 
   var html = '<div class="fade-up">' +
     '<div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%"></div></div>' +
     '<div class="round-header">' +
       '<div><div class="round-num">Round ' + (state.round + 1) + ' of 9</div>' +
       '<div class="phase-label">Life Connection</div></div>' +
-      seeWall +
+      '<div>' + headerLinks + '</div>' +
     '</div>' +
     '<div class="question-text">' + r.appQ + '</div>' +
     '<div class="choices" id="choices-b">';
@@ -895,6 +975,7 @@ function finishRound() {
 /* ===== RESULTS ===== */
 function showResults() {
   state.screen = 'results';
+  state.showAllProvisions = false;
 
   var completed = 0;
   for (var i = 0; i < state.results.length; i++) {
@@ -956,6 +1037,7 @@ function pickFinal(btn) {
 }
 
 function keepBuilding() {
+  state.showAllProvisions = false;
   var next = -1;
   for (var i = 0; i < state.results.length; i++) {
     if (!state.results[i].completed) { next = i; break; }
@@ -967,7 +1049,63 @@ function keepBuilding() {
 
 function resetGame() {
   state.sunriseFrame = 0;
+  state.showAllProvisions = false;
   renderWelcome();
+}
+
+/* ===== WRAP UP ===== */
+function showWrapUp() {
+  state.screen = 'wrapup';
+  state.showAllProvisions = true;
+
+  var completed = 0;
+  for (var i = 0; i < state.results.length; i++) {
+    if (state.results[i].completed) completed++;
+  }
+  var allDone = (completed === 9);
+
+  var labels = ['A', 'B', 'C'];
+
+  // Build provisions list
+  var provListHtml = '<ul class="provisions-list">';
+  for (var i = 0; i < 9; i++) {
+    var res = state.results[i];
+    if (res.completed && res.appChoice >= 0) {
+      provListHtml += '<li><span class="prov-check">\u2713</span>' + STONE_TEXT[i][res.appChoice] + '</li>';
+    } else {
+      provListHtml += '<li><span class="prov-miss">\u25CB</span>' + STONE_DEFAULT[i] + '</li>';
+    }
+  }
+  provListHtml += '</ul>';
+
+  // Buttons
+  var btnsHtml;
+  if (allDone) {
+    btnsHtml = '<button class="btn btn-primary" onclick="resetGame()">Play Again</button>';
+  } else {
+    btnsHtml = '<button class="btn btn-primary" onclick="keepBuilding()">Keep Building</button>' +
+               '<button class="btn btn-secondary" onclick="resetGame()">Start Over</button>';
+  }
+
+  var html = '<div class="wrapup-content fade-up">' +
+    '<h2>God\u2019s Provision Is Complete</h2>' +
+    '<p class="wrapup-summary">' +
+      '<b>God is our provider.</b> He gave Nehemiah all that he needed: courage, wisdom, favor with the king, materials, protection, and the ability to lead and inspire the people. ' +
+      '<b>God gives His people what they need for the work He calls them to do.</b> Through prayer we can connect with God and ask for His provision. Prayer is an incredible privilege!' +
+    '</p>' +
+    provListHtml +
+    '<div class="final-app">' +
+      '<div class="question-text">' + FINAL_APP.stem + '</div>' +
+      '<div class="choices" id="final-choices">';
+
+  for (var i = 0; i < FINAL_APP.opts.length; i++) {
+    html += '<button class="choice-btn" data-idx="' + i + '" onclick="pickFinal(this)">' + labels[i] + ') ' + FINAL_APP.opts[i] + '</button>';
+  }
+
+  html += '</div></div>' +
+    '<div class="results-btns">' + btnsHtml + '</div></div>';
+
+  panel.innerHTML = html;
 }
 
 /* ===== CONFETTI ===== */
