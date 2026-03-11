@@ -108,20 +108,19 @@ body{font-family:'Nunito',Calibri,sans-serif;background:#0a1628;color:#fff;
 
 /* Results */
 .results-content{flex:1;display:flex;flex-direction:column;padding:10px 0}
-.results-content h2{font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:8px;text-align:center}
-.results-msg{font-size:.92rem;line-height:1.5;color:rgba(255,255,255,0.7);margin-bottom:18px;text-align:center}
+.results-content h2{font-size:2rem;font-weight:800;color:#fff;margin-bottom:10px;text-align:center}
+.results-msg{font-size:.92rem;line-height:1.55;color:rgba(255,255,255,0.7);margin-bottom:14px;text-align:center}
+.results-recap{font-size:.88rem;line-height:1.5;color:rgba(255,255,255,0.7);margin-bottom:16px}
+.results-recap b{color:rgba(255,255,255,0.9)}
+.recap-item{display:flex;gap:6px;margin:4px 0;font-size:.84rem;line-height:1.4;color:rgba(255,255,255,0.75)}
+.recap-item .recap-icon{color:#0D8B82;font-weight:700;flex-shrink:0}
+.missed-line{font-size:.84rem;color:rgba(255,255,255,0.45);margin-bottom:10px;font-style:italic}
 .final-app{margin:16px 0}
 .results-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
 
 /* Wrap Up */
 .wrapup-content{flex:1;display:flex;flex-direction:column;padding:10px 0;overflow-y:auto}
-.wrapup-content h2{font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:10px;text-align:center}
-.wrapup-summary{font-size:.9rem;line-height:1.55;color:rgba(255,255,255,0.65);margin-bottom:16px}
-.wrapup-summary b{color:rgba(255,255,255,0.9)}
-.provisions-list{list-style:none;padding:0;margin:0 0 18px 0}
-.provisions-list li{font-size:.82rem;line-height:1.45;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.7)}
-.provisions-list li .prov-check{color:#0D8B82;font-weight:700;margin-right:6px}
-.provisions-list li .prov-miss{color:#667;margin-right:6px}
+.wrapup-content h2{font-size:1.8rem;font-weight:800;color:#fff;margin-bottom:10px;text-align:center}
 
 /* Confetti */
 .confetti-piece{position:fixed;top:-20px;width:10px;height:10px;border-radius:2px;
@@ -640,7 +639,7 @@ function drawScene() {
         stoneLabel = STONE_DEFAULT[i];
       }
       ctx.fillStyle = 'rgba(255,255,255,0.95)';
-      var fontSize = Math.max(10, Math.min(14, sw / 8));
+      var fontSize = Math.max(16, Math.min(22, sw / 4.5));
       ctx.font = '700 ' + fontSize + 'px Nunito, Calibri, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -978,6 +977,27 @@ function finishRound() {
   };
 }
 
+/* ===== PERSONALIZED RECAP ===== */
+function buildRecapHtml() {
+  var items = '';
+  for (var i = 0; i < 9; i++) {
+    var res = state.results[i];
+    if (res.completed && res.appChoice >= 0) {
+      items += '<div class="recap-item"><span class="recap-icon">\u2713</span>' + STONE_TEXT[i][res.appChoice] + '</div>';
+    }
+  }
+  return items;
+}
+
+function buildMissedLine() {
+  var missed = [];
+  for (var i = 0; i < 9; i++) {
+    if (!state.results[i].completed) missed.push(PROVISIONS[i].toLowerCase());
+  }
+  if (missed.length === 0) return '';
+  return '<p class="missed-line">You didn\u2019t get to ' + missed.join(', ') + ' \u2014 but God provided those too.</p>';
+}
+
 /* ===== RESULTS ===== */
 function showResults() {
   state.screen = 'results';
@@ -989,15 +1009,6 @@ function showResults() {
   }
   var allDone = (completed === 9);
 
-  var msg;
-  if (allDone) {
-    msg = "Your wall is complete! Just as God provided everything Nehemiah needed, He provides for you too.";
-  } else if (completed === 0) {
-    msg = "Your wall is waiting! Come back to discover how God provided for Nehemiah.";
-  } else {
-    msg = "You\u2019ve laid " + completed + " stone" + (completed > 1 ? "s" : "") + " so far! Every provision you found is a reminder of God\u2019s faithfulness.";
-  }
-
   var labels = ['A', 'B', 'C'];
   var btnsHtml;
   if (allDone) {
@@ -1008,9 +1019,23 @@ function showResults() {
   }
 
   var html = '<div class="results-content fade-up">' +
-    '<h2>' + (allDone ? 'Wall Complete!' : 'Your Wall So Far') + '</h2>' +
-    '<p class="results-msg">' + msg + '</p>' +
-    '<div class="final-app">' +
+    '<h2>' + (allDone ? 'Wall Complete!' : 'Your Wall So Far') + '</h2>';
+
+  if (allDone) {
+    html += '<p class="results-msg">God gave Nehemiah everything he needed to rebuild Jerusalem\u2019s walls. Through prayer, Nehemiah connected with God and received every provision. God provides for you too.</p>';
+  } else if (completed === 0) {
+    html += '<p class="results-msg">Your wall is waiting! Come back to discover how God provided for Nehemiah.</p>';
+  } else {
+    html += '<p class="results-msg">You\u2019ve laid ' + completed + ' stone' + (completed > 1 ? 's' : '') + ' so far!</p>';
+    html += buildMissedLine();
+  }
+
+  if (completed > 0) {
+    html += '<p class="results-recap"><b>What you decided to apply this week:</b></p>';
+    html += buildRecapHtml();
+  }
+
+  html += '<div class="final-app">' +
       '<div class="question-text">' + FINAL_APP.stem + '</div>' +
       '<div class="choices" id="final-choices">';
 
@@ -1072,18 +1097,6 @@ function showWrapUp() {
 
   var labels = ['A', 'B', 'C'];
 
-  // Build provisions list
-  var provListHtml = '<ul class="provisions-list">';
-  for (var i = 0; i < 9; i++) {
-    var res = state.results[i];
-    if (res.completed && res.appChoice >= 0) {
-      provListHtml += '<li><span class="prov-check">\u2713</span>' + STONE_TEXT[i][res.appChoice] + '</li>';
-    } else {
-      provListHtml += '<li><span class="prov-miss">\u25CB</span>' + STONE_DEFAULT[i] + '</li>';
-    }
-  }
-  provListHtml += '</ul>';
-
   // Buttons
   var btnsHtml;
   if (allDone) {
@@ -1095,12 +1108,16 @@ function showWrapUp() {
 
   var html = '<div class="wrapup-content fade-up">' +
     '<h2>God\u2019s Provision Is Complete</h2>' +
-    '<p class="wrapup-summary">' +
-      '<b>God is our provider.</b> He gave Nehemiah all that he needed: courage, wisdom, favor with the king, materials, protection, and the ability to lead and inspire the people. ' +
-      '<b>God gives His people what they need for the work He calls them to do.</b> Through prayer we can connect with God and ask for His provision. Prayer is an incredible privilege!' +
-    '</p>' +
-    provListHtml +
-    '<div class="final-app">' +
+    '<p class="results-msg">God gave Nehemiah everything he needed: courage, wisdom, favor, materials, protection, and people to work alongside him. God gives His people what they need for the work He calls them to do. Through prayer we can connect with God and ask for His provision.</p>';
+
+  html += buildMissedLine();
+
+  if (completed > 0) {
+    html += '<p class="results-recap"><b>What you decided to apply this week:</b></p>';
+    html += buildRecapHtml();
+  }
+
+  html += '<div class="final-app">' +
       '<div class="question-text">' + FINAL_APP.stem + '</div>' +
       '<div class="choices" id="final-choices">';
 
