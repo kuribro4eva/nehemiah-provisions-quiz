@@ -578,16 +578,16 @@ function drawScene() {
     }
 
     if (res && res.completed) {
-      var stoneScale, color;
+      var color;
       if (res.attempts === 1) {
-        stoneScale = 1; color = '#B8956A';
+        color = '#B8956A';
       } else if (res.attempts === 2) {
-        stoneScale = 0.82; color = '#C4AA80';
+        color = '#C4AA80';
       } else {
-        stoneScale = 0.65; color = '#D4C4A0';
+        color = '#D4C4A0';
       }
-      var sw = cellW * stoneScale;
-      var sh = cellH * stoneScale;
+      var sw = cellW;
+      var sh = cellH;
       var stoneX = sx + (cellW - sw) / 2;
       var targetY = sy + (cellH - sh) / 2;
       var stoneY = targetY;
