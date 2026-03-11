@@ -415,7 +415,7 @@ var PROV_SHORT = [
 function initResults() {
   state.results = [];
   for (var i = 0; i < 9; i++) {
-    state.results.push({ completed: false, attempts: 0, appChoice: -1, customText: '' });
+    state.results.push({ completed: false, attempts: 0, appChoice: -1, customText: '', customBlanks: null });
   }
 }
 
@@ -1116,9 +1116,11 @@ function submitD() {
   SND.click();
   var tmpl = STONE_TEMPLATES[state.round];
   var sentence = '';
+  var blanks = [];
   for (var b = 0; b < tmpl.blanks.length; b++) {
     sentence += tmpl.parts[b];
     var val = document.getElementById('blank-' + b).value.trim();
+    blanks.push(val);
     sentence += val;
   }
   sentence += tmpl.parts[tmpl.parts.length - 1];
@@ -1129,6 +1131,7 @@ function submitD() {
 
   state.results[state.round].appChoice = 3;
   state.results[state.round].customText = sentence;
+  state.results[state.round].customBlanks = blanks;
   state.results[state.round].completed = true;
 
   // Lock the inputs
@@ -1168,10 +1171,8 @@ function buildRecapPills() {
     var res = state.results[i];
     if (res.completed && res.appChoice >= 0) {
       var pillText;
-      if (res.appChoice === 3 && res.customText) {
-        // Truncate custom text to first 6 words for pill
-        var cwords = res.customText.split(' ');
-        pillText = cwords.length > 6 ? cwords.slice(0, 6).join(' ') + '\u2026' : res.customText;
+      if (res.appChoice === 3 && res.customBlanks) {
+        pillText = res.customBlanks.join(' \u00b7 ');
       } else if (res.appChoice < 3) {
         pillText = RECAP_SHORT[i][res.appChoice];
       }
