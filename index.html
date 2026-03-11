@@ -578,67 +578,73 @@ function drawScene() {
     }
 
     if (res && res.completed) {
-      var color;
-      if (res.attempts === 1) {
-        color = '#B8956A';
-      } else if (res.attempts === 2) {
-        color = '#C4AA80';
-      } else {
-        color = '#D4C4A0';
-      }
       var sw = cellW;
       var sh = cellH;
-      var stoneX = sx + (cellW - sw) / 2;
-      var targetY = sy + (cellH - sh) / 2;
+      var stoneX = sx;
+      var targetY = sy;
       var stoneY = targetY;
 
       if (isAnimating) {
-        var eased = 1 - Math.pow(1 - animProgress, 3); // ease-out cubic
+        var eased = 1 - Math.pow(1 - animProgress, 3);
         stoneY = (targetY - 60) + 60 * eased;
-        if (animProgress < 1) {
-          // Semi-transparent during animation
-        }
       }
 
       // Shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.2)';
-      roundRect(ctx, stoneX + 2, stoneY + 2, sw, sh, 5);
+      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      roundRect(ctx, stoneX + 3, stoneY + 3, sw, sh, 4);
       ctx.fill();
 
-      // Stone body
-      ctx.fillStyle = color;
-      roundRect(ctx, stoneX, stoneY, sw, sh, 5);
+      // Stone body - uniform warm sandstone
+      ctx.fillStyle = '#C4A56B';
+      roundRect(ctx, stoneX, stoneY, sw, sh, 4);
       ctx.fill();
 
-      // Border
-      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-      ctx.lineWidth = 1;
-      roundRect(ctx, stoneX, stoneY, sw, sh, 5);
-      ctx.stroke();
+      // Stone texture: subtle gradient overlay (lighter top, darker bottom)
+      var stoneGrad = ctx.createLinearGradient(stoneX, stoneY, stoneX, stoneY + sh);
+      stoneGrad.addColorStop(0, 'rgba(255,255,255,0.12)');
+      stoneGrad.addColorStop(0.5, 'rgba(0,0,0,0)');
+      stoneGrad.addColorStop(1, 'rgba(0,0,0,0.1)');
+      ctx.fillStyle = stoneGrad;
+      roundRect(ctx, stoneX, stoneY, sw, sh, 4);
+      ctx.fill();
 
-      // Texture lines
-      ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+      // Mortar lines (horizontal cracks)
+      ctx.strokeStyle = 'rgba(80,60,40,0.15)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(stoneX + sw * 0.15, stoneY + sh * 0.4);
-      ctx.lineTo(stoneX + sw * 0.85, stoneY + sh * 0.4);
-      ctx.moveTo(stoneX + sw * 0.25, stoneY + sh * 0.65);
-      ctx.lineTo(stoneX + sw * 0.75, stoneY + sh * 0.65);
+      ctx.moveTo(stoneX + 6, stoneY + sh * 0.3);
+      ctx.lineTo(stoneX + sw - 6, stoneY + sh * 0.3);
+      ctx.moveTo(stoneX + 10, stoneY + sh * 0.55);
+      ctx.lineTo(stoneX + sw - 10, stoneY + sh * 0.55);
+      ctx.moveTo(stoneX + 8, stoneY + sh * 0.75);
+      ctx.lineTo(stoneX + sw - 8, stoneY + sh * 0.75);
       ctx.stroke();
 
-      // Personalized stone text
+      // Edge weathering (darker inset border)
+      ctx.strokeStyle = 'rgba(80,60,40,0.2)';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, stoneX + 1, stoneY + 1, sw - 2, sh - 2, 3);
+      ctx.stroke();
+
+      // Outer border
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+      ctx.lineWidth = 1;
+      roundRect(ctx, stoneX, stoneY, sw, sh, 4);
+      ctx.stroke();
+
+      // Personalized stone text - larger, filling the stone
       var stoneLabel;
-      if (res.completed && res.appChoice >= 0) {
+      if (res.appChoice >= 0) {
         stoneLabel = STONE_TEXT[i][res.appChoice];
       } else {
         stoneLabel = STONE_DEFAULT[i];
       }
-      ctx.fillStyle = '#fff';
-      var fontSize = Math.max(7, Math.min(10, sw / 12));
-      ctx.font = 'bold ' + fontSize + 'px Nunito, Calibri, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      var fontSize = Math.max(10, Math.min(14, sw / 8));
+      ctx.font = '700 ' + fontSize + 'px Nunito, Calibri, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      wrapText(ctx, stoneLabel, stoneX + sw / 2, stoneY + sh / 2, sw - 8, fontSize + 2);
+      wrapText(ctx, stoneLabel, stoneX + sw / 2, stoneY + sh / 2, sw - 16, fontSize + 3);
     } else {
       // Empty slot - dotted outline
       ctx.setLineDash([4, 3]);
