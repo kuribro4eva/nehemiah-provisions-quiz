@@ -298,15 +298,15 @@ var RECAP_SHORT = [
 // Fill-in-blank templates for D option: [round] = { parts: ["prefix","suffix"], blanks: [{hint,max},...] }
 // Each blank's max is a word count limit sized so the full sentence fits on the stone (~18 words total max)
 var STONE_TEMPLATES = [
-  { parts: ["God opened my eyes to a need and I will ",""], blanks: [{hint:"what you will do",max:40}] },
-  { parts: ["Through prayer I can connect with God, so I will ",""], blanks: [{hint:"what you will bring to God",max:35}] },
-  { parts: ["God\u2019s Word gives me wisdom and ",""], blanks: [{hint:"how it helps you",max:40}] },
-  { parts: ["God gives me courage so I will ",""], blanks: [{hint:"what you will do",max:45}] },
-  { parts: ["God placed me "," so I can ",""], blanks: [{hint:"where",max:25},{hint:"what you will do there",max:30}] },
-  { parts: ["God is clearing my path by ",""], blanks: [{hint:"what God is removing or providing",max:40}] },
-  { parts: ["God provides what I need for His work so I will ",""], blanks: [{hint:"how you will respond",max:35}] },
-  { parts: ["God protects and guides me through ",""], blanks: [{hint:"who guides you",max:40}] },
-  { parts: ["God calls His people to work together and I will ",""], blanks: [{hint:"how you will serve alongside others",max:35}] }
+  { parts: ["God opened my eyes to a need and I will ",""], blanks: [{hint:"what you will do",max:30}] },
+  { parts: ["Through prayer I can connect with God, so I will ",""], blanks: [{hint:"what you will bring to God",max:28}] },
+  { parts: ["God\u2019s Word gives me wisdom and ",""], blanks: [{hint:"how it helps you",max:30}] },
+  { parts: ["God gives me courage so I will ",""], blanks: [{hint:"what you will do",max:30}] },
+  { parts: ["God placed me "," so I can ",""], blanks: [{hint:"where",max:18},{hint:"what you will do there",max:22}] },
+  { parts: ["God is clearing my path by ",""], blanks: [{hint:"what God is removing or providing",max:30}] },
+  { parts: ["God provides what I need for His work so I will ",""], blanks: [{hint:"how you will respond",max:28}] },
+  { parts: ["God protects and guides me through ",""], blanks: [{hint:"who guides you",max:30}] },
+  { parts: ["God calls His people to work together and I will ",""], blanks: [{hint:"how you will serve alongside others",max:28}] }
 ];
 
 /* ===== SOUND ENGINE ===== */
@@ -704,15 +704,31 @@ function drawScene() {
         sentLines = [];
         var cur = '';
         for (var wi = 0; wi < words.length; wi++) {
-          var test = cur + words[wi] + ' ';
-          if (ctx.measureText(test).width > maxWrap && wi > 0) {
-            sentLines.push(cur.trim());
-            cur = words[wi] + ' ';
+          var word = words[wi];
+          // Break long words that exceed line width by themselves
+          if (ctx.measureText(word).width > maxWrap) {
+            if (cur.trim()) { sentLines.push(cur.trim()); cur = ''; }
+            var chunk = '';
+            for (var ci = 0; ci < word.length; ci++) {
+              if (ctx.measureText(chunk + word[ci]).width > maxWrap && chunk) {
+                sentLines.push(chunk);
+                chunk = word[ci];
+              } else {
+                chunk += word[ci];
+              }
+            }
+            cur = chunk + ' ';
           } else {
-            cur = test;
+            var test = cur + word + ' ';
+            if (ctx.measureText(test).width > maxWrap && cur.trim()) {
+              sentLines.push(cur.trim());
+              cur = word + ' ';
+            } else {
+              cur = test;
+            }
           }
         }
-        sentLines.push(cur.trim());
+        if (cur.trim()) sentLines.push(cur.trim());
         if (sentLines.length * lineH <= sentAvailH) break;
       }
 
