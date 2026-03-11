@@ -103,7 +103,7 @@ body{font-family:'Nunito',Calibri,sans-serif;background:#0a1628;color:#fff;
 .fillin-input{background:rgba(255,255,255,0.1);border:2px solid #0D8B82;border-radius:8px;color:#fff;font-size:1.6rem;padding:8px 14px;width:100%;max-width:400px;font-family:inherit;outline:none}
 .fillin-input:focus{border-color:#7eddd6;background:rgba(255,255,255,0.15)}
 .fillin-input:disabled{opacity:0.6;border-color:#555}
-.fillin-counter{display:block;font-size:1.1rem;margin-top:3px;color:rgba(255,255,255,0.4)}
+.fillin-counter{display:block;font-size:1.1rem;margin-bottom:3px;color:rgba(255,255,255,0.4)}
 .fillin-submit-wrap{text-align:center;margin-top:14px}
 
 .feedback{margin-top:18px;padding:16px 20px;border-radius:10px;font-weight:600;font-size:1.9rem;
@@ -1072,8 +1072,8 @@ function pickD() {
   for (var b = 0; b < tmpl.blanks.length; b++) {
     if (b === 0) html += '<span class="fillin-prefix">' + tmpl.parts[0] + '</span>';
     html += '<div class="fillin-input-wrap">' +
-      '<input type="text" class="fillin-input" id="blank-' + b + '" placeholder="' + tmpl.blanks[b].hint + '" maxlength="' + tmpl.blanks[b].max + '" oninput="checkBlanks()">' +
       '<span class="fillin-counter" id="counter-' + b + '">0 / ' + tmpl.blanks[b].max + ' characters</span>' +
+      '<input type="text" class="fillin-input" id="blank-' + b + '" placeholder="' + tmpl.blanks[b].hint + '" maxlength="' + tmpl.blanks[b].max + '" oninput="checkBlanks()">' +
     '</div>';
     html += '<span class="fillin-prefix">' + tmpl.parts[b + 1] + '</span>';
   }
