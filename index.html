@@ -679,27 +679,8 @@ function drawScene() {
       } else {
         stoneLabel = STONE_DEFAULT[i];
       }
-      var isCustom = (res && res.appChoice === 3 && res.customText);
-      var fontSize = isCustom ? Math.max(17, Math.min(24, sw / 4)) : Math.max(21, Math.min(30, sw / 3.3));
       var labelSize = Math.max(18, Math.min(28, sw / 3.5));
-      var lineH = fontSize + 3;
       var labelH = labelSize + 4;
-
-      // Measure sentence lines to center everything vertically
-      ctx.font = '700 ' + fontSize + 'px Nunito, Calibri, sans-serif';
-      var sentWords = stoneLabel.split(' ');
-      var sentLines = [];
-      var sentLine = '';
-      for (var wi = 0; wi < sentWords.length; wi++) {
-        var testLine = sentLine + sentWords[wi] + ' ';
-        if (ctx.measureText(testLine).width > sw - 20 && wi > 0) {
-          sentLines.push(sentLine.trim());
-          sentLine = sentWords[wi] + ' ';
-        } else {
-          sentLine = testLine;
-        }
-      }
-      sentLines.push(sentLine.trim());
 
       // Provision label - fixed position at top of stone
       var labelY = stoneY + sh * 0.09;
@@ -709,9 +690,33 @@ function drawScene() {
       ctx.textBaseline = 'top';
       ctx.fillText(PROV_SHORT[i], stoneX + sw / 2, labelY);
 
-      // Sentence - centered in remaining space below label
+      // Sentence - auto-shrink font until it fits in available space
       var sentTop = labelY + labelH + 6;
       var sentAvailH = (stoneY + sh - sh * 0.08) - sentTop;
+      var maxWrap = sw - 16;
+      var fontSize = Math.min(30, sw / 3.3);
+      var sentLines, lineH;
+      // Shrink loop: reduce font until text block fits vertically
+      for (; fontSize >= 10; fontSize -= 1) {
+        lineH = fontSize + 3;
+        ctx.font = '700 ' + fontSize + 'px Nunito, Calibri, sans-serif';
+        var words = stoneLabel.split(' ');
+        sentLines = [];
+        var cur = '';
+        for (var wi = 0; wi < words.length; wi++) {
+          var test = cur + words[wi] + ' ';
+          if (ctx.measureText(test).width > maxWrap && wi > 0) {
+            sentLines.push(cur.trim());
+            cur = words[wi] + ' ';
+          } else {
+            cur = test;
+          }
+        }
+        sentLines.push(cur.trim());
+        if (sentLines.length * lineH <= sentAvailH) break;
+      }
+
+      // Draw sentence centered in available space
       var sentBlockH = sentLines.length * lineH;
       var sentStartY = sentTop + (sentAvailH - sentBlockH) / 2;
       ctx.fillStyle = 'rgba(255,255,255,0.95)';
