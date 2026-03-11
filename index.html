@@ -674,20 +674,21 @@ function drawScene() {
       }
       sentLines.push(sentLine.trim());
 
-      var totalH = labelH + 4 + sentLines.length * lineH;
-      var startY = stoneY + (sh - totalH) / 2;
-
-      // Provision label (dark brown, high contrast on sandstone)
+      // Provision label - fixed position at top of stone
+      var labelY = stoneY + sh * 0.12;
       ctx.fillStyle = '#3D2B1F';
       ctx.font = '800 ' + labelSize + 'px Nunito, Calibri, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText(PROV_SHORT[i], stoneX + sw / 2, startY);
+      ctx.fillText(PROV_SHORT[i], stoneX + sw / 2, labelY);
 
-      // Sentence (white)
+      // Sentence - centered in remaining space below label
+      var sentTop = labelY + labelH + 6;
+      var sentAvailH = (stoneY + sh - sh * 0.08) - sentTop;
+      var sentBlockH = sentLines.length * lineH;
+      var sentStartY = sentTop + (sentAvailH - sentBlockH) / 2;
       ctx.fillStyle = 'rgba(255,255,255,0.95)';
       ctx.font = '700 ' + fontSize + 'px Nunito, Calibri, sans-serif';
-      var sentStartY = startY + labelH + 4;
       for (var li = 0; li < sentLines.length; li++) {
         ctx.fillText(sentLines[li], stoneX + sw / 2, sentStartY + li * lineH);
       }
