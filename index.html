@@ -3,583 +3,637 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>God's Provisions for Nehemiah</title>
+<title>Rebuild the Wall — Nehemiah 1-3</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0D8B82;--teal-dark:#066B67;--teal-light:#E6F5F3;--teal-accent:#D0ECE9;
+  --cream:#FBF4E4;--coral:#E07A5F;
+  --stone-big:#B8956A;--stone-med:#C4AA80;--stone-small:#D4C4A0;
+  --bg:#f7f7f5;--text:#2C3E50;
+}
+body{font-family:'Nunito',Calibri,sans-serif;background:var(--bg);color:var(--text);
+  display:flex;justify-content:center;min-height:100vh;padding:12px}
+#app{width:100%;max-width:640px;position:relative;padding-bottom:40px}
 
-  :root {
-    --coral: #C0513A;
-    --coral-light: #d4715c;
-    --cream: #FBF4E4;
-    --cream-dark: #f0e6ce;
-    --dark: #2c2421;
-    --green: #4caf50;
-    --green-bg: #e8f5e9;
-    --red: #c62828;
-    --red-bg: #fce4e4;
-  }
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}
+  100%{transform:translateY(calc(100vh + 20px)) rotate(720deg);opacity:0}}
 
-  body {
-    font-family: 'Nunito', Calibri, system-ui, sans-serif;
-    background: var(--cream);
-    color: var(--dark);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    padding: 16px;
-  }
+.fade-up{animation:fadeUp .45s ease both}
+.pop{animation:pop .35s ease}
+.shake{animation:shake .4s ease}
 
-  #app {
-    width: 100%;
-    max-width: 640px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+/* Buttons */
+.btn{display:inline-block;padding:14px 32px;border:none;border-radius:12px;
+  font-family:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--teal-dark)}
+.btn-secondary{background:var(--teal-accent);color:var(--teal-dark)}
+.btn-secondary:hover{background:#c0e5e1}
 
-  .progress-bar-wrap {
-    width: 100%;
-    height: 10px;
-    background: var(--cream-dark);
-    border-radius: 5px;
-    margin-bottom: 20px;
-    overflow: hidden;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-  .progress-bar-wrap.visible { opacity: 1; }
-  .progress-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--coral);
-    border-radius: 5px;
-    transition: width 0.5s ease;
-  }
+/* See My Wall floating pill */
+#see-wall-btn{position:fixed;top:16px;right:16px;z-index:100;
+  padding:10px 22px;border-radius:999px;background:var(--teal);color:#fff;
+  font-family:inherit;font-weight:700;font-size:.9rem;border:none;cursor:pointer;
+  box-shadow:0 2px 10px rgba(0,0,0,.18);transition:all .25s;display:none}
+#see-wall-btn:hover{background:var(--teal-dark);transform:translateY(-1px)}
 
-  .score-pill {
-    align-self: flex-end;
-    background: var(--coral);
-    color: #fff;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    margin-bottom: 12px;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-  .score-pill.visible { opacity: 1; }
-  .score-pill .pts { font-size: 1.1rem; }
+/* Welcome */
+#welcome{text-align:center;padding:60px 20px 40px}
+#welcome h1{font-size:2.1rem;font-weight:800;color:var(--teal-dark);margin-bottom:4px}
+#welcome .subtitle{font-size:1.1rem;color:var(--teal);font-weight:600;margin-bottom:20px}
+#welcome p{font-size:1rem;line-height:1.6;margin-bottom:28px;color:#555}
 
-  .card {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    padding: 32px 28px;
-    width: 100%;
-    animation: fadeUp 0.45s ease both;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+/* Round screen */
+#round-screen{display:none}
+.round-header{text-align:center;margin-bottom:18px}
+.round-header .round-num{font-size:.85rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px}
+.round-header .phase-label{font-size:1.15rem;font-weight:700;color:var(--teal-dark);margin-top:2px}
 
-  .card h1 {
-    font-size: 1.65rem;
-    color: var(--coral);
-    text-align: center;
-    margin-bottom: 4px;
-  }
-  .card .subtitle {
-    text-align: center;
-    font-size: 1rem;
-    color: #888;
-    margin-bottom: 20px;
-    font-weight: 600;
-  }
-  .card .intro-text {
-    font-size: 0.97rem;
-    line-height: 1.6;
-    margin-bottom: 24px;
-    text-align: center;
-  }
+.scripture-box{background:var(--cream);border-left:5px solid var(--coral);border-radius:0 8px 8px 0;
+  padding:20px 22px;margin-bottom:22px;font-style:italic;line-height:1.55;font-size:1.02rem}
+.scripture-box .ref{display:block;margin-top:8px;font-style:normal;font-size:.85rem;
+  font-weight:700;color:var(--coral)}
 
-  .btn {
-    display: inline-block;
-    background: var(--coral);
-    color: #fff;
-    border: none;
-    padding: 14px 36px;
-    border-radius: 12px;
-    font-family: inherit;
-    font-size: 1.05rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .btn:hover { background: var(--coral-light); transform: scale(1.03); }
-  .btn:active { transform: scale(0.97); }
-  .center { display: flex; justify-content: center; }
+.question-text{font-size:1.05rem;font-weight:700;margin-bottom:14px;line-height:1.45}
 
-  .q-number {
-    font-weight: 800;
-    font-size: 0.85rem;
-    color: var(--coral);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 12px;
-  }
-  .scripture-box {
-    background: var(--cream);
-    border-left: 4px solid var(--coral);
-    padding: 16px 18px;
-    border-radius: 0 10px 10px 0;
-    margin-bottom: 24px;
-    font-style: italic;
-    line-height: 1.65;
-    font-size: 0.97rem;
-  }
-  .scripture-box .ref {
-    display: block;
-    font-style: normal;
-    font-weight: 700;
-    margin-top: 8px;
-    font-size: 0.85rem;
-    color: var(--coral);
-  }
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice-btn{width:100%;text-align:left;padding:14px 18px;border:2px solid var(--teal-accent);
+  border-radius:10px;background:#fff;font-family:inherit;font-size:.98rem;cursor:pointer;
+  transition:all .18s;line-height:1.4;font-weight:600;color:var(--text)}
+.choice-btn:hover:not(.locked){border-color:var(--teal);background:var(--teal-light)}
+.choice-btn.correct{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark)}
+.choice-btn.wrong{border-color:var(--coral);background:#fdeae5;color:var(--coral)}
+.choice-btn.locked{cursor:default;opacity:.7}
+.choice-btn.locked.correct{opacity:1}
+.choice-btn.selected{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);opacity:1}
 
-  .choices { display: flex; flex-direction: column; gap: 10px; }
-  .choice-btn {
-    background: #fff;
-    border: 2px solid var(--cream-dark);
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-family: inherit;
-    font-size: 0.97rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: left;
-    transition: border-color 0.2s, background 0.2s, transform 0.15s;
-  }
-  .choice-btn:hover:not(.locked) {
-    border-color: var(--coral);
-    background: #fff7f5;
-    transform: translateX(4px);
-  }
-  .choice-btn.correct {
-    border-color: var(--green);
-    background: var(--green-bg);
-    animation: pop 0.35s ease;
-  }
-  .choice-btn.wrong {
-    border-color: var(--red);
-    background: var(--red-bg);
-    animation: shake 0.4s ease;
-  }
-  .choice-btn.reveal-correct {
-    border-color: var(--green);
-    background: var(--green-bg);
-  }
-  .choice-btn.locked { cursor: default; }
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-weight:600;font-size:.95rem;
+  display:none;text-align:center}
+.feedback.show{display:block;animation:fadeUp .3s ease both}
+.feedback.correct-fb{background:var(--teal-light);color:var(--teal-dark)}
+.feedback.wrong-fb{background:#fdeae5;color:var(--coral)}
 
-  @keyframes pop {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.04); }
-    100% { transform: scale(1); }
-  }
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    20% { transform: translateX(-6px); }
-    40% { transform: translateX(6px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
-  }
+.next-btn-wrap{text-align:center;margin-top:20px}
 
-  .feedback {
-    margin-top: 16px;
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 0.95rem;
-    text-align: center;
-    animation: fadeUp 0.3s ease both;
-  }
-  .feedback.correct-fb { background: var(--green-bg); color: var(--green); }
-  .feedback.wrong-fb { background: var(--red-bg); color: var(--red); }
+/* Progress bar */
+.progress-wrap{width:100%;height:8px;background:var(--teal-accent);border-radius:99px;margin-bottom:18px;overflow:hidden}
+.progress-bar{height:100%;background:var(--teal);border-radius:99px;transition:width .4s ease}
 
-  .next-area {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
+/* Results */
+#results-screen{display:none;text-align:center;padding:20px 10px}
+#results-screen h2{font-size:1.6rem;font-weight:800;color:var(--teal-dark);margin-bottom:8px}
+.results-msg{font-size:1rem;line-height:1.55;color:#555;margin-bottom:22px;padding:0 8px}
+#wall-canvas{width:100%;border-radius:12px;margin-bottom:22px;display:block}
+.final-app{text-align:left;margin:20px 0;padding:0 4px}
+.final-app .question-text{font-size:1rem}
+.results-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
 
-  .result-score {
-    font-size: 3.5rem;
-    font-weight: 800;
-    color: var(--coral);
-    text-align: center;
-    margin: 16px 0 4px;
-  }
-  .result-label {
-    text-align: center;
-    font-size: 1rem;
-    color: #999;
-    font-weight: 600;
-    margin-bottom: 20px;
-  }
-  .result-msg {
-    font-size: 0.97rem;
-    line-height: 1.65;
-    margin-bottom: 28px;
-    text-align: center;
-  }
-  .stars { text-align: center; font-size: 2rem; margin-bottom: 10px; }
+/* Confetti */
+.confetti-piece{position:fixed;top:-20px;width:10px;height:10px;border-radius:2px;
+  animation:confettiFall linear forwards;pointer-events:none;z-index:9999}
 
-  #confetti-canvas {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 999;
-  }
-
-  @media (max-width: 480px) {
-    .card { padding: 22px 16px; }
-    .card h1 { font-size: 1.35rem; }
-    .scripture-box { padding: 12px 14px; font-size: 0.93rem; }
-  }
+@media(max-width:400px){
+  #welcome h1{font-size:1.6rem}
+  .scripture-box{padding:14px 16px;font-size:.95rem}
+  .choice-btn{padding:12px 14px;font-size:.92rem}
+}
 </style>
 </head>
 <body>
 <div id="app">
-  <div class="progress-bar-wrap" id="progressWrap">
-    <div class="progress-fill" id="progressFill"></div>
+  <button id="see-wall-btn" onclick="showResults()">See My Wall</button>
+
+  <!-- Welcome Screen -->
+  <div id="welcome" class="fade-up">
+    <h1>Rebuild the Wall</h1>
+    <div class="subtitle">Nehemiah 1&ndash;3</div>
+    <p>Nehemiah heard that Jerusalem&rsquo;s walls were broken down &mdash; and he decided to do something about it. But first, God provided everything he needed.<br><br>
+    Can you spot God&rsquo;s provisions? Answer correctly to lay strong stones and rebuild the wall!</p>
+    <button class="btn btn-primary" onclick="startGame()">Start Building</button>
   </div>
-  <div class="score-pill" id="scorePill"><span class="pts" id="scoreNum">0</span> / 9</div>
-  <div id="cardContainer"></div>
+
+  <!-- Round Screen -->
+  <div id="round-screen"></div>
+
+  <!-- Results Screen -->
+  <div id="results-screen"></div>
 </div>
-<canvas id="confetti-canvas"></canvas>
 
 <script>
-const QUESTIONS = [
+/* ===== DATA ===== */
+var ROUNDS = [
   {
-    scripture: "So it was, when I heard these words, that I sat down and wept, and mourned for many days; I was fasting and praying before the God of heaven.",
-    ref: "Nehemiah 1:4",
+    scripture: "\u201CSo it was, when I heard these words, that I sat down and wept, and mourned for many days\u201D",
+    ref: "Nehemiah 1:2\u20134 NKJV",
+    correct: "News about Jerusalem\u2019s condition",
+    wrong: ["Access to God through prayer", "Favor with the king", "An armed escort"],
+    appQ: "When you see a need around you, what is your first response?",
+    appOpts: ["I stop and pray about it before acting", "I share the need with someone I trust", "I research what\u2019s really going on before jumping in"]
+  },
+  {
+    scripture: "\u201CI was fasting and praying before the God of heaven\u201D",
+    ref: "Nehemiah 1:4\u20135 NKJV",
     correct: "Access to God through prayer",
-    wrong: ["An armed escort", "Letters for safe passage", "Timber for building"]
+    wrong: ["Timber for building", "Letters for safe passage", "A united workforce"],
+    appQ: "What situation in your life needs prayer right now?",
+    appOpts: ["A friendship that feels broken", "A decision I\u2019m not sure about", "Someone I know who is hurting"]
   },
   {
-    scripture: "I pray, LORD God of heaven, O great and awesome God, You who keep Your covenant and mercy with those who love You",
-    ref: "Nehemiah 1:5",
-    correct: "Courage to lead",
-    wrong: ["A united workforce", "Timber for building", "Favor with the king"]
+    scripture: "\u201CRemember, I pray, the word that You commanded Your servant Moses\u201D",
+    ref: "Nehemiah 1:8\u20139 NKJV",
+    correct: "Wisdom from knowing God\u2019s Word",
+    wrong: ["An armed escort", "Opportunity to speak", "Courage to lead"],
+    appQ: "How does God\u2019s Word guide your everyday choices?",
+    appOpts: ["It reminds me what\u2019s true when I\u2019m confused", "It gives me courage to do what\u2019s right", "It helps me see people the way God sees them"]
   },
   {
-    scripture: "Remember, I pray, the word that You commanded Your servant Moses, saying, \u2018If you are unfaithful, I will scatter you\u2026 but if you return to Me\u2026 I will gather them\u2019",
-    ref: "Nehemiah 1:8\u20139",
-    correct: "Wisdom for careful planning",
-    wrong: ["An armed escort", "Opportunity to speak", "Letters for safe passage"]
+    scripture: "\u201CI was very much afraid, and said to the king...\u201D",
+    ref: "Nehemiah 2:1\u20133 NKJV",
+    correct: "Courage to speak despite fear",
+    wrong: ["Timber for building", "A united workforce", "Letters for safe passage"],
+    appQ: "Where is God asking you to be brave this week?",
+    appOpts: ["Standing up for someone at school", "Starting a conversation I\u2019ve been avoiding", "Trying something hard that God put on my heart"]
   },
   {
-    scripture: "Let Your servant prosper this day, I pray, and grant him mercy in the sight of this man.",
-    ref: "Nehemiah 1:11",
+    scripture: "\u201CThe king said to me, \u2018What do you request?\u2019 So I prayed to the God of heaven\u201D",
+    ref: "Nehemiah 2:4\u20136 NKJV",
     correct: "Favor with the king",
-    wrong: ["Timber for building", "A united workforce", "Courage to lead"]
+    wrong: ["An armed escort", "News about Jerusalem", "Wisdom from God\u2019s Word"],
+    appQ: "Where has God placed you to make a difference?",
+    appOpts: ["In my family \u2014 I can bring peace and encouragement", "At school \u2014 I can be a godly example", "On my team or in my group \u2014 I can serve others"]
   },
   {
-    scripture: "The king said to me\u2026 \u2018How long will your journey be? And when will you return?\u2019 So it pleased the king to send me; and I set him a time.",
-    ref: "Nehemiah 2:6",
-    correct: "Opportunity to leave his job and go to Jerusalem",
-    wrong: ["An armed escort", "Letters for safe passage", "Strength against opposition"]
-  },
-  {
-    scripture: "I said to the king, \u2018If it pleases the king, let letters be given to me for the governors of the region beyond the River, that they must permit me to pass through till I come to Judah.\u2019",
-    ref: "Nehemiah 2:7",
+    scripture: "\u201CLet letters be given to me for the governors... that they must permit me to pass through\u201D",
+    ref: "Nehemiah 2:7 NKJV",
     correct: "Letters for safe passage",
-    wrong: ["Timber for building", "Favor with the king", "A united workforce"]
+    wrong: ["Timber for building", "Favor with the king", "A united workforce"],
+    appQ: "What obstacle is God clearing out of your way right now?",
+    appOpts: ["Fear that was holding me back", "A relationship that needed to be restored", "A resource I didn\u2019t think I\u2019d have"]
   },
   {
-    scripture: "And a letter to Asaph the keeper of the king\u2019s forest, that he must give me timber to make beams for the gates of the citadel\u2026 for the city wall, and for the house that I will occupy.",
-    ref: "Nehemiah 2:8a",
-    correct: "Timber for building",
-    wrong: ["An armed escort", "Letters for safe passage", "Wisdom for planning"]
+    scripture: "\u201CA letter to Asaph the keeper of the king\u2019s forest, that he must give me timber\u201D",
+    ref: "Nehemiah 2:8a NKJV",
+    correct: "Timber and materials for building",
+    wrong: ["An armed escort", "Letters for safe passage", "Courage to lead"],
+    appQ: "What resources has God given you to serve Him?",
+    appOpts: ["Skills or talents I can use for others", "Time I can give to something that matters", "A home, church, or community where I can serve"]
   },
   {
-    scripture: "And the king granted them to me because the good hand of my God was upon me\u2026 Then I went to the governors beyond the River, and gave them the king\u2019s letters. The king had also sent captains of the army and horsemen with me.",
-    ref: "Nehemiah 2:8b\u20139",
+    scripture: "\u201CThe king had also sent captains of the army and horsemen with me\u201D",
+    ref: "Nehemiah 2:9 NKJV",
     correct: "An armed escort for protection",
-    wrong: ["A united workforce", "Favor with the king", "Timber for building"]
+    wrong: ["A united workforce", "Timber for building", "Favor with the king"],
+    appQ: "Who has God placed in your life to protect and guide you?",
+    appOpts: ["A parent or family member who points me to God", "A teacher, coach, or mentor who encourages me", "A friend who helps me make wise choices"]
   },
   {
-    scripture: "Then I said to them, \u2018You see the trouble we are in\u2026 Come, let us rebuild the wall of Jerusalem\u2019\u2026 So they said, \u2018Let us rise up and build.\u2019 Then they set their hands to this good work.",
-    ref: "Nehemiah 2:17\u201318",
-    correct: "A united workforce to build the wall",
-    wrong: ["Letters for safe passage", "Strength against opposition", "Opportunity to speak"]
+    scripture: "\u201CCome, let us rebuild the wall... So they said, \u2018Let us rise up and build\u2019\u201D",
+    ref: "Nehemiah 2:17\u201318 NKJV",
+    correct: "A united workforce",
+    wrong: ["Letters for safe passage", "An armed escort", "News about Jerusalem"],
+    appQ: "Who is God calling you to work alongside this week?",
+    appOpts: ["A family member \u2014 doing something together for God", "A friend \u2014 encouraging each other to grow", "My church or Bible study \u2014 serving side by side"]
   }
 ];
 
-const ENCOURAGEMENTS = [
-  "Awesome!", "Nailed it!", "Great job!", "You got it!",
-  "Exactly right!", "Way to go!", "Nice one!", "Spot on!", "Yes!"
-];
+var FINAL_APP = {
+  stem: "Because God provides everything I need, this week I will\u2026",
+  opts: [
+    "Pray like Nehemiah \u2014 adoring God, confessing, claiming promises, making a bold request",
+    "Take one step of action on a burden God has placed on my heart",
+    "Encourage someone who is facing a hard task and remind them God provides"
+  ]
+};
 
-let score = 0;
-let current = -1;
+/* ===== STATE ===== */
+var currentRound = 0;
+var phase = "A";
+var attempts = 0;
+var phaseALocked = false;
+var roundResults = [];
 
+function initResults() {
+  roundResults = [];
+  for (var i = 0; i < 9; i++) {
+    roundResults.push({ completed: false, attempts: 0, appChoice: -1 });
+  }
+}
+
+/* ===== HELPERS ===== */
 function shuffle(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
   }
   return a;
 }
 
-function getEl(id) { return document.getElementById(id); }
+function esc(s) { return encodeURIComponent(s); }
+function unesc(s) { return decodeURIComponent(s); }
 
-function clearChildren(el) {
-  while (el.firstChild) el.removeChild(el.firstChild);
+/* ===== START ===== */
+function startGame() {
+  currentRound = 0;
+  initResults();
+  document.getElementById("welcome").style.display = "none";
+  document.getElementById("results-screen").style.display = "none";
+  document.getElementById("round-screen").style.display = "block";
+  showRound();
 }
 
-function makeEl(tag, className, textContent) {
-  var e = document.createElement(tag);
-  if (className) e.className = className;
-  if (textContent !== undefined) e.textContent = textContent;
-  return e;
+function showRound() {
+  phase = "A";
+  attempts = 0;
+  phaseALocked = false;
+  if (currentRound >= 1) {
+    document.getElementById("see-wall-btn").style.display = "block";
+  }
+  renderPhaseA();
 }
 
-function updateProgress() {
-  var pct = current < 0 ? 0 : (current / QUESTIONS.length) * 100;
-  getEl('progressFill').style.width = pct + '%';
-}
+/* ===== PHASE A ===== */
+function renderPhaseA() {
+  var r = ROUNDS[currentRound];
+  var choices = shuffle([r.correct].concat(r.wrong));
+  var pct = Math.round((currentRound / 9) * 100);
 
-function showWelcome() {
-  current = -1;
-  score = 0;
-  getEl('scoreNum').textContent = '0';
-  getEl('progressWrap').classList.remove('visible');
-  getEl('scorePill').classList.remove('visible');
-  updateProgress();
+  var html = '<div class="fade-up">' +
+    '<div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%"></div></div>' +
+    '<div class="round-header">' +
+      '<div class="round-num">Round ' + (currentRound + 1) + ' of 9</div>' +
+      '<div class="phase-label">What did God provide?</div>' +
+    '</div>' +
+    '<div class="scripture-box">' +
+      r.scripture +
+      '<span class="ref">&mdash; ' + r.ref + '</span>' +
+    '</div>' +
+    '<div class="choices" id="choices-a">';
 
-  var container = getEl('cardContainer');
-  clearChildren(container);
-
-  var card = makeEl('div', 'card');
-
-  var h1 = makeEl('h1', null, "God's Provisions for Nehemiah");
-  card.appendChild(h1);
-
-  var sub = makeEl('p', 'subtitle', "Match the Scripture to God's provision");
-  card.appendChild(sub);
-
-  var intro = makeEl('p', 'intro-text');
-  intro.appendChild(document.createTextNode("Nehemiah prayed with adoration, confession, God's promises, and a specific request. God answered with "));
-  var strong = makeEl('strong', null, "everything he needed");
-  intro.appendChild(strong);
-  intro.appendChild(document.createTextNode(". Can you identify God's provisions in Scripture?"));
-  card.appendChild(intro);
-
-  var btnWrap = makeEl('div', 'center');
-  var btn = makeEl('button', 'btn', "Let's Go!");
-  btn.addEventListener('click', nextQuestion);
-  btnWrap.appendChild(btn);
-  card.appendChild(btnWrap);
-
-  container.appendChild(card);
-}
-
-function nextQuestion() {
-  current++;
-  if (current >= QUESTIONS.length) {
-    showResults();
-    return;
+  for (var i = 0; i < choices.length; i++) {
+    html += '<button class="choice-btn" data-val="' + esc(choices[i]) + '" onclick="pickA(this)">' + choices[i] + '</button>';
   }
 
-  getEl('progressWrap').classList.add('visible');
-  getEl('scorePill').classList.add('visible');
-  updateProgress();
+  html += '</div>' +
+    '<div class="feedback" id="feedback-a"></div>' +
+    '<div class="next-btn-wrap" id="next-a" style="display:none">' +
+      '<button class="btn btn-primary" onclick="goPhaseB()">Next &rarr;</button>' +
+    '</div>' +
+  '</div>';
 
-  var q = QUESTIONS[current];
-  var choices = shuffle([q.correct].concat(q.wrong));
-
-  var container = getEl('cardContainer');
-  clearChildren(container);
-
-  var card = makeEl('div', 'card');
-
-  var qNum = makeEl('div', 'q-number', 'Question ' + (current + 1) + ' of ' + QUESTIONS.length);
-  card.appendChild(qNum);
-
-  var sBox = makeEl('div', 'scripture-box');
-  sBox.appendChild(document.createTextNode('\u201c' + q.scripture + '\u201d'));
-  var ref = makeEl('span', 'ref', '\u2014 ' + q.ref + ' (NKJV)');
-  sBox.appendChild(ref);
-  card.appendChild(sBox);
-
-  var choicesDiv = makeEl('div', 'choices');
-  choicesDiv.id = 'choices';
-
-  var lockedForQuestion = current;
-  var answered = false;
-
-  choices.forEach(function(c) {
-    var btn = makeEl('button', 'choice-btn', c);
-    btn.setAttribute('data-value', c);
-    btn.setAttribute('data-answer', c === q.correct ? 'correct' : 'wrong');
-    btn.addEventListener('click', function() {
-      if (answered || lockedForQuestion !== current) return;
-      answered = true;
-
-      var allBtns = choicesDiv.querySelectorAll('.choice-btn');
-      allBtns.forEach(function(b) { b.classList.add('locked'); });
-
-      var isCorrect = c === q.correct;
-
-      if (isCorrect) {
-        btn.classList.add('correct');
-        score++;
-        getEl('scoreNum').textContent = score;
-        var msg = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
-        var fb = makeEl('div', 'feedback correct-fb', msg);
-        feedbackArea.appendChild(fb);
-      } else {
-        btn.classList.add('wrong');
-        allBtns.forEach(function(b) {
-          if (b.getAttribute('data-answer') === 'correct') b.classList.add('reveal-correct');
-        });
-        var fb = makeEl('div', 'feedback wrong-fb', 'The answer was: ' + q.correct);
-        feedbackArea.appendChild(fb);
-      }
-
-      setTimeout(function() {
-        nextArea.style.display = 'flex';
-      }, 600);
-    });
-    choicesDiv.appendChild(btn);
-  });
-
-  card.appendChild(choicesDiv);
-
-  var feedbackArea = makeEl('div');
-  feedbackArea.id = 'feedbackArea';
-  card.appendChild(feedbackArea);
-
-  var nextArea = makeEl('div', 'next-area');
-  nextArea.id = 'nextArea';
-  nextArea.style.display = 'none';
-  var nextBtn = makeEl('button', 'btn', current < QUESTIONS.length - 1 ? 'Next Question' : 'See Results');
-  nextBtn.addEventListener('click', nextQuestion);
-  nextArea.appendChild(nextBtn);
-  card.appendChild(nextArea);
-
-  container.appendChild(card);
+  document.getElementById("round-screen").innerHTML = html;
 }
 
-function showResults() {
-  getEl('progressFill').style.width = '100%';
-  getEl('scorePill').classList.remove('visible');
+function pickA(btn) {
+  if (phaseALocked) return;
+  attempts++;
+  var val = unesc(btn.getAttribute("data-val"));
+  var r = ROUNDS[currentRound];
+  var fb = document.getElementById("feedback-a");
+  var allBtns = document.querySelectorAll("#choices-a .choice-btn");
 
-  var container = getEl('cardContainer');
-  clearChildren(container);
-
-  var card = makeEl('div', 'card');
-
-  card.appendChild(makeEl('h1', null, 'Results'));
-
-  var starsText = '';
-  var msgText = '';
-  if (score === 9) {
-    starsText = '\u2b50\u2b50\u2b50';
-    msgText = 'PERFECT SCORE! You really know Nehemiah!';
-    setTimeout(launchConfetti, 300);
-  } else if (score >= 7) {
-    starsText = '\u2b50\u2b50';
-    msgText = 'Great work! You know God\u2019s provisions well!';
-  } else if (score >= 5) {
-    starsText = '\u2b50';
-    msgText = 'Good effort! Review Nehemiah 1\u20133 and try again!';
-  } else {
-    msgText = 'Keep studying! Read Nehemiah 1\u20133 and give it another shot!';
-  }
-
-  if (starsText) card.appendChild(makeEl('div', 'stars', starsText));
-  card.appendChild(makeEl('div', 'result-score', score + ' / 9'));
-  card.appendChild(makeEl('div', 'result-label', msgText));
-
-  var resultMsg = makeEl('p', 'result-msg');
-  resultMsg.appendChild(document.createTextNode(
-    "God is our provider. He answered Nehemiah\u2019s prayer by giving him everything he needed \u2014 courage, wisdom, favor, letters, timber, soldiers, and a community of workers. God gives His people what they need for the work He calls them to do."
-  ));
-  resultMsg.appendChild(document.createElement('br'));
-  resultMsg.appendChild(document.createElement('br'));
-  var boldQ = makeEl('strong', null, 'What has God provided for you?');
-  resultMsg.appendChild(boldQ);
-  card.appendChild(resultMsg);
-
-  var btnWrap = makeEl('div', 'center');
-  var btn = makeEl('button', 'btn', 'Play Again');
-  btn.addEventListener('click', showWelcome);
-  btnWrap.appendChild(btn);
-  card.appendChild(btnWrap);
-
-  container.appendChild(card);
-}
-
-function launchConfetti() {
-  var canvas = getEl('confetti-canvas');
-  var ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  var pieces = [];
-  var colors = ['#C0513A','#f0a500','#4caf50','#2196f3','#e91e63','#9c27b0','#ff9800'];
-  for (var i = 0; i < 150; i++) {
-    pieces.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height,
-      w: Math.random() * 10 + 5,
-      h: Math.random() * 6 + 3,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      vy: Math.random() * 3 + 2,
-      vx: (Math.random() - 0.5) * 2,
-      rot: Math.random() * 360,
-      rv: (Math.random() - 0.5) * 8
-    });
-  }
-
-  var frame = 0;
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    var alive = false;
-    for (var i = 0; i < pieces.length; i++) {
-      var p = pieces[i];
-      p.y += p.vy;
-      p.x += p.vx;
-      p.rot += p.rv;
-      p.vy += 0.04;
-      if (p.y < canvas.height + 20) alive = true;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot * Math.PI / 180);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-      ctx.restore();
+  if (val === r.correct) {
+    phaseALocked = true;
+    btn.classList.add("correct");
+    btn.classList.add("pop");
+    for (var i = 0; i < allBtns.length; i++) {
+      if (allBtns[i] !== btn) allBtns[i].classList.add("locked");
     }
-    frame++;
-    if (alive && frame < 300) requestAnimationFrame(draw);
-    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fb.textContent = "That\u2019s right! God provided exactly what was needed.";
+    fb.className = "feedback show correct-fb";
+    roundResults[currentRound].attempts = attempts;
+    document.getElementById("next-a").style.display = "block";
+  } else {
+    btn.classList.add("wrong");
+    btn.classList.add("shake");
+    btn.classList.add("locked");
+
+    // Count remaining unlocked buttons
+    var remaining = 0;
+    for (var i = 0; i < allBtns.length; i++) {
+      if (!allBtns[i].classList.contains("locked")) remaining++;
+    }
+
+    if (remaining <= 1) {
+      // All wrong picked — reveal correct and move on
+      phaseALocked = true;
+      roundResults[currentRound].attempts = attempts;
+      for (var i = 0; i < allBtns.length; i++) {
+        var v = unesc(allBtns[i].getAttribute("data-val"));
+        if (v === r.correct) {
+          allBtns[i].classList.add("correct");
+          allBtns[i].classList.add("pop");
+        } else {
+          allBtns[i].classList.add("locked");
+        }
+      }
+      fb.textContent = "The answer was: " + r.correct;
+      fb.className = "feedback show wrong-fb";
+      document.getElementById("next-a").style.display = "block";
+    } else {
+      fb.textContent = "Not quite \u2014 try again!";
+      fb.className = "feedback show wrong-fb";
+    }
   }
-  draw();
 }
 
-window.addEventListener('resize', function() {
-  var c = getEl('confetti-canvas');
-  c.width = window.innerWidth;
-  c.height = window.innerHeight;
-});
+/* ===== PHASE B ===== */
+function goPhaseB() {
+  phase = "B";
+  renderPhaseB();
+}
 
-showWelcome();
+function renderPhaseB() {
+  var r = ROUNDS[currentRound];
+  var pct = Math.round(((currentRound + 0.5) / 9) * 100);
+  var labels = ["A", "B", "C"];
+
+  var html = '<div class="fade-up">' +
+    '<div class="progress-wrap"><div class="progress-bar" style="width:' + pct + '%"></div></div>' +
+    '<div class="round-header">' +
+      '<div class="round-num">Round ' + (currentRound + 1) + ' of 9</div>' +
+      '<div class="phase-label">Life Connection</div>' +
+    '</div>' +
+    '<div class="question-text">' + r.appQ + '</div>' +
+    '<div class="choices" id="choices-b">';
+
+  for (var i = 0; i < r.appOpts.length; i++) {
+    html += '<button class="choice-btn" data-idx="' + i + '" onclick="pickB(this,' + i + ')">' + labels[i] + ') ' + r.appOpts[i] + '</button>';
+  }
+
+  html += '</div>' +
+    '<div class="next-btn-wrap" id="next-b" style="display:none">' +
+      '<button class="btn btn-primary" onclick="finishRound()">Continue Building &rarr;</button>' +
+    '</div>' +
+  '</div>';
+
+  document.getElementById("round-screen").innerHTML = html;
+}
+
+function pickB(btn, idx) {
+  var allBtns = document.querySelectorAll("#choices-b .choice-btn");
+  // Allow changing selection
+  for (var i = 0; i < allBtns.length; i++) {
+    allBtns[i].classList.remove("selected", "locked");
+  }
+  btn.classList.add("selected");
+  for (var i = 0; i < allBtns.length; i++) {
+    if (allBtns[i] !== btn) allBtns[i].classList.add("locked");
+  }
+  roundResults[currentRound].appChoice = idx;
+  roundResults[currentRound].completed = true;
+  document.getElementById("next-b").style.display = "block";
+}
+
+function finishRound() {
+  currentRound++;
+  if (currentRound >= 9) {
+    showResults();
+  } else {
+    showRound();
+  }
+}
+
+/* ===== RESULTS ===== */
+function showResults() {
+  document.getElementById("round-screen").style.display = "none";
+  document.getElementById("welcome").style.display = "none";
+  document.getElementById("see-wall-btn").style.display = "none";
+  var rs = document.getElementById("results-screen");
+  rs.style.display = "block";
+
+  var completed = 0;
+  for (var i = 0; i < roundResults.length; i++) {
+    if (roundResults[i].completed) completed++;
+  }
+  var allDone = (completed === 9);
+
+  var msg;
+  if (allDone) {
+    msg = "Your wall is complete! Just as God provided everything Nehemiah needed, He provides for you too.";
+  } else if (completed === 0) {
+    msg = "Your wall is waiting to be built! Come back and discover all the ways God provided for Nehemiah.";
+  } else {
+    msg = "You\u2019ve laid " + completed + " stone" + (completed > 1 ? "s" : "") + " so far! Every provision you found is a reminder of God\u2019s faithfulness. Come back anytime to finish your wall.";
+  }
+
+  var labels = ["A", "B", "C"];
+  var btnsHtml;
+  if (allDone) {
+    btnsHtml = '<button class="btn btn-primary" onclick="resetGame()">Play Again</button>';
+  } else {
+    btnsHtml = '<button class="btn btn-primary" onclick="keepBuilding()">Keep Building</button>' +
+               '<button class="btn btn-secondary" onclick="resetGame()">Start Over</button>';
+  }
+
+  var html = '<div class="fade-up">' +
+    '<h2>' + (allDone ? "Wall Complete!" : "Your Wall So Far") + '</h2>' +
+    '<p class="results-msg">' + msg + '</p>' +
+    '<canvas id="wall-canvas" width="600" height="300"></canvas>' +
+    '<div class="final-app">' +
+      '<div class="question-text">' + FINAL_APP.stem + '</div>' +
+      '<div class="choices" id="final-choices">';
+
+  for (var i = 0; i < FINAL_APP.opts.length; i++) {
+    html += '<button class="choice-btn" data-idx="' + i + '" onclick="pickFinal(this)">' + labels[i] + ') ' + FINAL_APP.opts[i] + '</button>';
+  }
+
+  html += '</div></div>' +
+    '<div class="results-btns">' + btnsHtml + '</div>' +
+  '</div>';
+
+  rs.innerHTML = html;
+  drawWall(false);
+
+  if (allDone) {
+    setTimeout(launchConfetti, 400);
+  }
+}
+
+function pickFinal(btn) {
+  var allBtns = document.querySelectorAll("#final-choices .choice-btn");
+  for (var i = 0; i < allBtns.length; i++) {
+    allBtns[i].classList.remove("selected", "locked");
+  }
+  btn.classList.add("selected");
+  for (var i = 0; i < allBtns.length; i++) {
+    if (allBtns[i] !== btn) allBtns[i].classList.add("locked");
+  }
+}
+
+function keepBuilding() {
+  // Find next incomplete round
+  var next = -1;
+  for (var i = 0; i < roundResults.length; i++) {
+    if (!roundResults[i].completed) { next = i; break; }
+  }
+  if (next === -1) { showResults(); return; }
+  currentRound = next;
+  document.getElementById("results-screen").style.display = "none";
+  document.getElementById("round-screen").style.display = "block";
+  showRound();
+}
+
+function resetGame() {
+  document.getElementById("results-screen").style.display = "none";
+  document.getElementById("welcome").style.display = "block";
+  document.getElementById("see-wall-btn").style.display = "none";
+}
+
+/* ===== WALL CANVAS ===== */
+function drawWall(animate) {
+  var canvas = document.getElementById("wall-canvas");
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+
+  // Handle high-DPI displays
+  var dpr = window.devicePixelRatio || 1;
+  var displayW = canvas.clientWidth;
+  var displayH = 300;
+  canvas.style.height = displayH + "px";
+  canvas.width = displayW * dpr;
+  canvas.height = displayH * dpr;
+  ctx.scale(dpr, dpr);
+
+  var W = displayW;
+  var H = displayH;
+
+  // Background
+  ctx.fillStyle = "#e8e0d0";
+  roundRect(ctx, 0, 0, W, H, 12);
+  ctx.fill();
+
+  // Ground line
+  ctx.fillStyle = "#c4b896";
+  roundRect(ctx, 0, H - 16, W, 16, 6);
+  ctx.fill();
+
+  // Wall grid: 3 rows x 3 cols = 9 sections
+  var cols = 3, rows = 3;
+  var pad = 16;
+  var gapX = 10, gapY = 10;
+  var totalW = W - pad * 2;
+  var totalH = H - pad * 2 - 16; // leave room for ground
+  var cellW = (totalW - gapX * (cols - 1)) / cols;
+  var cellH = (totalH - gapY * (rows - 1)) / rows;
+
+  for (var i = 0; i < 9; i++) {
+    var col = i % 3;
+    var row = Math.floor(i / 3);
+    var x = pad + col * (cellW + gapX);
+    // Draw from bottom row up: round 0-2 = bottom, 3-5 = middle, 6-8 = top
+    var drawRow = 2 - row;
+    var y = pad + drawRow * (cellH + gapY);
+    var res = roundResults[i];
+
+    if (res && res.completed) {
+      var stoneW, stoneH, color, shadowColor;
+      if (res.attempts === 1) {
+        stoneW = cellW; stoneH = cellH;
+        color = "#B8956A"; shadowColor = "rgba(139,112,78,0.35)";
+      } else if (res.attempts === 2) {
+        stoneW = cellW * 0.82; stoneH = cellH * 0.82;
+        color = "#C4AA80"; shadowColor = "rgba(150,130,90,0.3)";
+      } else {
+        stoneW = cellW * 0.65; stoneH = cellH * 0.65;
+        color = "#D4C4A0"; shadowColor = "rgba(160,148,110,0.25)";
+      }
+      var sx = x + (cellW - stoneW) / 2;
+      var sy = y + (cellH - stoneH) / 2;
+
+      // Shadow
+      ctx.fillStyle = shadowColor;
+      roundRect(ctx, sx + 3, sy + 3, stoneW, stoneH, 6);
+      ctx.fill();
+
+      // Stone body
+      ctx.fillStyle = color;
+      roundRect(ctx, sx, sy, stoneW, stoneH, 6);
+      ctx.fill();
+
+      // Stone border
+      ctx.strokeStyle = "rgba(0,0,0,0.1)";
+      ctx.lineWidth = 1;
+      roundRect(ctx, sx, sy, stoneW, stoneH, 6);
+      ctx.stroke();
+
+      // Texture lines
+      ctx.strokeStyle = "rgba(0,0,0,0.06)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sx + stoneW * 0.15, sy + stoneH * 0.4);
+      ctx.lineTo(sx + stoneW * 0.85, sy + stoneH * 0.4);
+      ctx.moveTo(sx + stoneW * 0.25, sy + stoneH * 0.65);
+      ctx.lineTo(sx + stoneW * 0.75, sy + stoneH * 0.65);
+      ctx.stroke();
+
+      // Label
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold " + Math.max(11, Math.min(14, cellW / 8)) + "px Nunito, Calibri, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("Round " + (i + 1), x + cellW / 2, y + cellH / 2);
+    } else {
+      // Gap - dotted outline
+      ctx.setLineDash([5, 4]);
+      ctx.strokeStyle = "#B0B0B0";
+      ctx.lineWidth = 2;
+      roundRect(ctx, x + 6, y + 6, cellW - 12, cellH - 12, 6);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Gap label
+      ctx.fillStyle = "#bbb";
+      ctx.font = "600 " + Math.max(10, Math.min(12, cellW / 9)) + "px Nunito, Calibri, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("Round " + (i + 1), x + cellW / 2, y + cellH / 2);
+    }
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+/* ===== CONFETTI ===== */
+function launchConfetti() {
+  var colors = ["#0D8B82", "#E07A5F", "#F2CC8F", "#81B29A", "#3D405B", "#F4F1DE"];
+  for (var i = 0; i < 80; i++) {
+    var el = document.createElement("div");
+    el.className = "confetti-piece";
+    el.style.left = (Math.random() * 100) + "vw";
+    el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    el.style.width = (6 + Math.random() * 8) + "px";
+    el.style.height = (6 + Math.random() * 8) + "px";
+    el.style.animationDuration = (2 + Math.random() * 2) + "s";
+    el.style.animationDelay = (Math.random() * 1.5) + "s";
+    el.style.borderRadius = (Math.random() > 0.5 ? "50%" : "2px");
+    document.body.appendChild(el);
+    (function(elem) {
+      setTimeout(function() { if (elem.parentNode) elem.parentNode.removeChild(elem); }, 5500);
+    })(el);
+  }
+}
+
+/* ===== INIT ===== */
+initResults();
 </script>
 </body>
 </html>
