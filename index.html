@@ -108,15 +108,14 @@ body{font-family:'Nunito',Calibri,sans-serif;background:#0a1628;color:#fff;
 
 /* Results + Wrap Up shared */
 .results-content,.wrapup-content{flex:1;display:flex;flex-direction:column;padding:10px 0;overflow-y:auto}
-.results-content h2,.wrapup-content h2{font-size:2.2rem;font-weight:800;color:#fff;margin-bottom:10px;text-align:center}
-.closing-para{font-size:1.05rem;line-height:1.55;color:rgba(255,255,255,0.75);margin-bottom:16px;text-align:center}
+.results-content h2,.wrapup-content h2{font-size:2.5rem;font-weight:800;color:#fff;margin-bottom:12px;text-align:center}
+.closing-para{font-size:1.15rem;line-height:1.6;color:rgba(255,255,255,0.78);margin-bottom:18px;text-align:center}
 .closing-para b{color:rgba(255,255,255,0.95)}
-.missed-line{font-size:1rem;color:rgba(255,255,255,0.45);margin-bottom:12px;font-style:italic;text-align:center}
-.recap-heading{font-size:1.1rem;font-weight:700;color:#7eddd6;margin-bottom:10px}
-.recap-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
-.recap-pill{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;
-  background:rgba(13,139,130,0.18);border:1px solid rgba(13,139,130,0.35);font-size:.95rem;font-weight:600;color:#7eddd6}
-.recap-pill .pill-label{color:rgba(255,255,255,0.5);font-weight:400;font-size:.85rem}
+.missed-line{font-size:1.05rem;color:rgba(255,255,255,0.45);margin-bottom:14px;font-style:italic;text-align:center}
+.recap-heading{font-size:1.25rem;font-weight:700;color:#7eddd6;margin-bottom:12px}
+.recap-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.recap-pill{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:22px;
+  background:rgba(13,139,130,0.18);border:1px solid rgba(13,139,130,0.35);font-size:1.1rem;font-weight:600;color:#7eddd6}
 .results-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
 
 /* Confetti */
@@ -586,7 +585,8 @@ function drawScene() {
       animProgress = Math.min(state.anim.frame / state.anim.maxFrames, 1);
     }
 
-    if (res && res.completed) {
+    var showAsStone = (res && res.completed) || state.showAllProvisions;
+    if (showAsStone) {
       var sw = cellW;
       var sh = cellH;
       var stoneX = sx;
@@ -641,9 +641,9 @@ function drawScene() {
       roundRect(ctx, stoneX, stoneY, sw, sh, 4);
       ctx.stroke();
 
-      // Personalized stone text - larger, filling the stone
+      // Stone text
       var stoneLabel;
-      if (res.appChoice >= 0) {
+      if (res && res.completed && res.appChoice >= 0) {
         stoneLabel = STONE_TEXT[i][res.appChoice];
       } else {
         stoneLabel = STONE_DEFAULT[i];
@@ -685,7 +685,7 @@ function drawScene() {
   var torchY = slotAreaY - 12;
   for (var ti = 0; ti < 9; ti++) {
     var tx = foundLeft + (ti + 0.5) * (foundW / 9);
-    var lit = state.results[ti] && state.results[ti].completed;
+    var lit = (state.results[ti] && state.results[ti].completed) || state.showAllProvisions;
 
     // Stick
     ctx.fillStyle = lit ? '#8B6914' : '#666';
@@ -1062,6 +1062,7 @@ function showResults() {
 
 function keepBuilding() {
   state.showAllProvisions = false;
+  state.sunriseFrame = 0;
   var next = -1;
   for (var i = 0; i < state.results.length; i++) {
     if (!state.results[i].completed) { next = i; break; }
@@ -1081,9 +1082,14 @@ function resetGame() {
 function showWrapUp() {
   state.screen = 'wrapup';
   state.showAllProvisions = true;
+  state.sunriseFrame = 1;
+  SND.sunrise();
 
   panel.innerHTML = '<div class="wrapup-content fade-up">' +
     buildEndingHtml('God\u2019s Provision Is Complete', true) + '</div>';
+
+  setTimeout(launchConfetti, 600);
+  setTimeout(function() { SND.confetti(); }, 700);
 }
 
 /* ===== CONFETTI ===== */
