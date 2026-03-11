@@ -298,15 +298,15 @@ var RECAP_SHORT = [
 // Fill-in-blank templates for D option: [round] = { parts: ["prefix","suffix"], blanks: [{hint,max},...] }
 // Each blank's max is a word count limit sized so the full sentence fits on the stone (~18 words total max)
 var STONE_TEMPLATES = [
-  { parts: ["God opened my eyes to a need and I will ",""], blanks: [{hint:"what you will do",max:6}] },
-  { parts: ["Through prayer I can connect with God, so I will ",""], blanks: [{hint:"what you will bring to God",max:6}] },
-  { parts: ["God\u2019s Word gives me wisdom and ",""], blanks: [{hint:"how it helps you",max:6}] },
-  { parts: ["God gives me courage so I will ",""], blanks: [{hint:"what you will do",max:7}] },
-  { parts: ["God placed me "," so I can ",""], blanks: [{hint:"where",max:4},{hint:"what you will do there",max:5}] },
-  { parts: ["God is clearing my path by ",""], blanks: [{hint:"what God is removing or providing",max:6}] },
-  { parts: ["God provides what I need for His work so I will ",""], blanks: [{hint:"how you will respond",max:6}] },
-  { parts: ["God protects and guides me through ",""], blanks: [{hint:"who guides you",max:6}] },
-  { parts: ["God calls His people to work together and I will ",""], blanks: [{hint:"how you will serve alongside others",max:6}] }
+  { parts: ["God opened my eyes to a need and I will ",""], blanks: [{hint:"what you will do",max:40}] },
+  { parts: ["Through prayer I can connect with God, so I will ",""], blanks: [{hint:"what you will bring to God",max:35}] },
+  { parts: ["God\u2019s Word gives me wisdom and ",""], blanks: [{hint:"how it helps you",max:40}] },
+  { parts: ["God gives me courage so I will ",""], blanks: [{hint:"what you will do",max:45}] },
+  { parts: ["God placed me "," so I can ",""], blanks: [{hint:"where",max:25},{hint:"what you will do there",max:30}] },
+  { parts: ["God is clearing my path by ",""], blanks: [{hint:"what God is removing or providing",max:40}] },
+  { parts: ["God provides what I need for His work so I will ",""], blanks: [{hint:"how you will respond",max:35}] },
+  { parts: ["God protects and guides me through ",""], blanks: [{hint:"who guides you",max:40}] },
+  { parts: ["God calls His people to work together and I will ",""], blanks: [{hint:"how you will serve alongside others",max:35}] }
 ];
 
 /* ===== SOUND ENGINE ===== */
@@ -1034,6 +1034,9 @@ function pickB(btn, idx) {
   }
   state.results[state.round].appChoice = idx;
   state.results[state.round].completed = true;
+  state.results[state.round].customText = '';
+  document.getElementById('fillin-area').style.display = 'none';
+  document.getElementById('fillin-area').innerHTML = '';
   document.getElementById('next-b').style.display = 'block';
 }
 
@@ -1053,8 +1056,8 @@ function pickD() {
   for (var b = 0; b < tmpl.blanks.length; b++) {
     if (b === 0) html += '<span class="fillin-prefix">' + tmpl.parts[0] + '</span>';
     html += '<div class="fillin-input-wrap">' +
-      '<input type="text" class="fillin-input" id="blank-' + b + '" placeholder="' + tmpl.blanks[b].hint + '" maxlength="60" oninput="checkBlanks()">' +
-      '<span class="fillin-counter" id="counter-' + b + '">0 / ' + tmpl.blanks[b].max + ' words</span>' +
+      '<input type="text" class="fillin-input" id="blank-' + b + '" placeholder="' + tmpl.blanks[b].hint + '" maxlength="' + tmpl.blanks[b].max + '" oninput="checkBlanks()">' +
+      '<span class="fillin-counter" id="counter-' + b + '">0 / ' + tmpl.blanks[b].max + ' characters</span>' +
     '</div>';
     html += '<span class="fillin-prefix">' + tmpl.parts[b + 1] + '</span>';
   }
@@ -1076,14 +1079,13 @@ function checkBlanks() {
   for (var b = 0; b < tmpl.blanks.length; b++) {
     var input = document.getElementById('blank-' + b);
     var counter = document.getElementById('counter-' + b);
-    var words = input.value.trim().split(/\s+/).filter(function(w) { return w.length > 0; });
-    var wc = words.length;
+    var charCount = input.value.trim().length;
     var max = tmpl.blanks[b].max;
-    counter.textContent = wc + ' / ' + max + ' words';
-    if (wc > max) {
+    counter.textContent = charCount + ' / ' + max + ' characters';
+    if (charCount > max) {
       counter.style.color = '#ff6b6b';
       allValid = false;
-    } else if (wc === 0) {
+    } else if (charCount === 0) {
       counter.style.color = 'rgba(255,255,255,0.4)';
       allValid = false;
     } else {
